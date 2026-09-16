@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Lịch chiếu{% endblock %}
+{% block content %}
+<div class="hero-box">
+    <h2 class="mb-1">Lịch chiếu</h2>
+    <p>Chọn suất phù hợp để đặt vé.</p>
+</div>
+
+<div class="table-box">
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Phim</th>
+            <th>Phòng</th>
+            <th>Thời gian</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for showtime in showtimes %}
+        <tr>
+            <td>{{ showtime.movie.title }}</td>
+            <td>{{ showtime.room.name }}</td>
+            <td>{{ showtime.start_time|date:'d/m/Y H:i' }}</td>
+            <td><a class="btn btn-sm btn-cinema" href="{% url 'book_ticket' showtime.id %}">Đặt vé</a></td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4">Chưa có lịch chiếu.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+
+<div class="detail-box">
+
+    <div class="row g-4">
+
+        <!-- =========================
+             ẢNH TỰA / POSTER
+             LẤY TỪ:
+             movie_backgrounds/<movie>/images/
+        ========================== -->
+
+        <div class="col-md-4">
+
+            <img
+                src="{{ movie_cover }}"
+                class="detail-poster"
+                alt="{{ movie.title }}"
+            >
+
+        </div>
+
+
+        <!-- =========================
+             THÔNG TIN PHIM
+        ========================== -->
+
+        <div class="col-md-8">
+
+            <h2>
+                {{ movie.title }}
+            </h2>
+
+            <p>
+                <strong>Thể loại:</strong>
+                {{ movie.genre }}
+            </p>
+
+            <p>
+                <strong>Thời lượng:</strong>
+                {{ movie.duration }} phút
+            </p>
+
+            <p>
+                <strong>Đạo diễn:</strong>
+                {{ movie.director }}
+            </p>
+
+            <p>
+                <strong>Ngày công chiếu:</strong>
+                {{ movie.release_date|date:"d/m/Y" }}
+            </p>
+
+            <p>
+                {{ movie.description }}
+            </p>
+
+
+            <hr>
+
+
+            <h3>
+                Suất chiếu
+            </h3>
+
+
+            {% for showtime in showtimes %}
+
+                <div class="showtime-item d-flex justify-content-between align-items-center">
+
+                    <span>
+
+                        {{ showtime.start_time|date:"d/m/Y H:i" }}
+
+                        ·
+
+                        {{ showtime.room.name }}
+
+                    </span>
+
+
+                    <a
+                        href="{% url 'book_ticket' showtime.id %}"
+                        class="btn btn-cinema btn-sm"
+                    >
+
+                        Đặt vé
+
+                    </a>
+
+                </div>
+
+            {% empty %}
+
+                <p>
+                    Hiện chưa có suất chiếu.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

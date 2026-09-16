@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "title": "Avengers: Endgame",
+    "genre": "Action, Adventure, Sci-Fi",
+    "duration": 181,
+    "director": "Anthony Russo, Joe Russo",
+    "release_date": "2019-04-26",
+    "description": "Sau những sự kiện tàn khốc của Infinity War, các Avengers còn lại tập hợp lần cuối để đảo ngược những gì Thanos đã gây ra."
+  },
+  {
+    "id": 2,
+    "title": "Interstellar",
+    "genre": "Sci-Fi, Adventure, Drama",
+    "duration": 169,
+    "director": "Christopher Nolan",
+    "release_date": "2014-11-07",
+    "description": "Một nhóm nhà du hành xuyên qua lỗ sâu trong không gian nhằm tìm một nơi ở mới cho nhân loại."
+  },
+  {
+    "id": 3,
+    "title": "Doraemon",
+    "genre": "Animation, Adventure, Family",
+    "duration": 110,
+    "director": "Takashi Yamazaki",
+    "release_date": "2024-01-01",
+    "description": "Doraemon và Nobita bắt đầu một cuộc phiêu lưu mới cùng những người bạn."
+  },
+  {
+    "id": 4,
+    "title": "Inception",
+    "genre": "Khoa học viễn tưởng, Hành động",
+    "duration": 148,
+    "director": "Christopher Nolan",
+    "release_date": "2010-07-16",
+    "description": "Một chuyên gia xâm nhập vào giấc mơ nhận nhiệm vụ cấy một ý tưởng vào tâm trí của mục tiêu."
+  },
+  {
+    "id": 5,
+    "title": "Spider-Man: No Way Home",
+    "genre": "Hành động, Phiêu lưu",
+    "duration": 148,
+    "director": "Jon Watts",
+    "release_date": "2021-12-17",
+    "description": "Peter Parker phải đối mặt với những hậu quả sau khi danh tính Spider-Man bị tiết lộ."
+  },
+  {
+    "id": 6,
+    "title": "Your Name",
+    "genre": "Hoạt hình, Tình cảm",
+    "duration": 106,
+    "director": "Makoto Shinkai",
+    "release_date": "2016-08-26",
+    "description": "Hai học sinh xa lạ bất ngờ hoán đổi cơ thể và tạo nên một mối liên kết vượt qua không gian và thời gian."
+  },
+  {
+    "id": 7,
+    "title": "The Dark Knight",
+    "genre": "Hành động, Tội phạm",
+    "duration": 152,
+    "director": "Christopher Nolan",
+    "release_date": "2008-07-18",
+    "description": "Batman phải đối đầu với Joker khi Gotham rơi vào một làn sóng hỗn loạn."
+  },
+  {
+    "id": 8,
+    "title": "Frozen II",
+    "genre": "Hoạt hình, Phiêu lưu",
+    "duration": 103,
+    "director": "Chris Buck, Jennifer Lee",
+    "release_date": "2019-11-22",
+    "description": "Elsa và Anna bắt đầu hành trình khám phá nguồn gốc sức mạnh của Elsa."
+  },
+  {
+    "id": 9,
+    "title": "Oppenheimer",
+    "genre": "Tiểu sử, Chính kịch",
+    "duration": 180,
+    "director": "Christopher Nolan",
+    "release_date": "2023-07-21",
+    "description": "Câu chuyện về nhà vật lý J. Robert Oppenheimer và dự án phát triển bom nguyên tử."
+  },
+  {
+    "id": 10,
+    "title": "Dune: Part Two",
+    "genre": "Khoa học viễn tưởng, Phiêu lưu",
+    "duration": 166,
+    "director": "Denis Villeneuve",
+    "release_date": "2024-03-01",
+    "description": "Paul Atreides tiếp tục hành trình cùng người Fremen trên hành tinh Arrakis."
+  },
+  {
+    "id": 11,
+    "title": "Avatar: The Way of Water",
+    "genre": "Khoa học viễn tưởng, Phiêu lưu",
+    "duration": 192,
+    "director": "James Cameron",
+    "release_date": "2022-12-16",
+    "description": "Gia đình Sully phải tìm nơi trú ẩn và khám phá những vùng biển mới trên Pandora."
+  },
+  {
+    "id": 12,
+    "title": "Godzilla x Kong",
+    "genre": "Hành động, Quái vật",
+    "duration": 115,
+    "director": "Adam Wingard",
+    "release_date": "2024-03-29",
+    "description": "Godzilla và Kong phải đối đầu với một mối đe dọa mới có thể thay đổi thế giới."
+  },
+  {
+    "id": 13,
+    "title": "Suzume",
+    "genre": "Hoạt hình, Phiêu lưu",
+    "duration": 122,
+    "director": "Makoto Shinkai",
+    "release_date": "2022-11-11",
+    "description": "Suzume bắt đầu hành trình đóng lại những cánh cửa bí ẩn đang gây ra thảm họa trên khắp Nhật Bản."
+  },
+  {
+    "id": 14,
+    "title": "Spirited Away",
+    "genre": "Hoạt hình, Fantasy",
+    "duration": 125,
+    "director": "Hayao Miyazaki",
+    "release_date": "2001-07-20",
+    "description": "Một cô bé bước vào thế giới linh hồn và phải tìm cách giải cứu cha mẹ."
+  },
+  {
+    "id": 15,
+    "title": "Guardians of the Galaxy Vol. 3",
+    "genre": "Hành động, Khoa học viễn tưởng",
+    "duration": 150,
+    "director": "James Gunn",
+    "release_date": "2023-05-05",
+    "description": "Nhóm Guardians bắt đầu một nhiệm vụ mới nhằm bảo vệ Rocket và những người bạn của mình."
+  }
+]

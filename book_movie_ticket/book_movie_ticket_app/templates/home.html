@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+
+<div class="hero-home">
+    <div class="hero-home-box">
+
+        <p class="hero-mini-title">
+            HỆ THỐNG ĐẶT VÉ XEM PHIM
+        </p>
+
+        <h1 class="hero-main-title">
+            Cinema Booking
+        </h1>
+
+        <p class="hero-description">
+            Đặt vé nhanh chóng, xem lịch chiếu, chọn ghế và quản lý vé ngay trên website.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{% url 'movie_list' %}" class="btn btn-cinema">
+                Xem danh sách phim
+            </a>
+
+            <a href="{% url 'schedule' %}" class="btn btn-outline-light">
+                Xem lịch chiếu
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="home-feature-grid">
+    <div class="home-feature-card">
+        <h3>🎬 Danh sách phim</h3>
+        <p>Xem các phim đang chiếu và thông tin chi tiết của từng phim.</p>
+    </div>
+
+    <div class="home-feature-card">
+        <h3>🗓 Lịch chiếu</h3>
+        <p>Theo dõi lịch chiếu theo ngày giờ và phòng chiếu.</p>
+    </div>
+
+    <div class="home-feature-card">
+        <h3>💺 Đặt vé</h3>
+        <p>Chọn ghế trực quan và lưu lại vé của bạn trong hệ thống.</p>
+    </div>
+</div>
+
+{% endblock %}

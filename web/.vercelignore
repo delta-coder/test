@@ -1,0 +1,22 @@
+# Ignore Python virtual environment
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Ignore local database
+*.sqlite3
+cinema.db
+*.db
+
+# Ignore video files
+*.mp4
+*.mkv
+*.avi
+
+# Ignore git and IDE
+.git/
+.cursor/
+.vscode/
+.idea/

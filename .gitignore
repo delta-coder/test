@@ -1,0 +1,48 @@
+# Python virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Database files (local runtime state)
+*.sqlite3
+cinema.db
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# IDE & Editor files
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+
+# Runtime logs & temporary state
+*.log
+.cinema_server_status.json
+live_seat_holds.json
+
+# Operating System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Large media files
+*.mp4
+*.mkv
+*.avi
+
+# Node modules / static builds (if added)
+node_modules/
+dist/
+.vercel/
+
+.vercel

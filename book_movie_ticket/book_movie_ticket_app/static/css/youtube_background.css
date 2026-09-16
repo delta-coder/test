@@ -1,0 +1,75 @@
+/* ===========================================================
+   YOUTUBE BACKGROUND
+=========================================================== */
+
+.background-youtube-host {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    display: none;
+
+    overflow: hidden;
+
+    background: #000;
+
+    pointer-events: none;
+
+}
+
+
+.background-youtube-host.active {
+
+    display: block;
+
+}
+
+
+.background-youtube-host iframe {
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    border: 0;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    pointer-events: none;
+
+}
+
+
+.background-image,
+.background-video {
+
+    z-index: 1;
+
+}
+
+
+.stage-overlay {
+
+    z-index: 2;
+
+}
+
+
+/* YouTube player không nhận click.
+   Content website vẫn nằm phía trên. */
+
+.stage-content {
+
+    position: relative;
+
+    z-index: 3;
+
+}

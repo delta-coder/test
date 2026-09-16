@@ -1,0 +1,530 @@
+/* ===========================================================
+   CINEMA BOOKING - MOBILE NAV HOTFIX
+   File này PHẢI được load sau mobile_916.css
+=========================================================== */
+
+
+/* ===========================================================
+   MOBILE NAVBAR / MENU
+=========================================================== */
+
+@media (max-width: 991.98px) {
+
+    /* -------------------------------------------------------
+       NAVBAR
+    -------------------------------------------------------- */
+
+    .site-navbar {
+        top: max(8px, env(safe-area-inset-top)) !important;
+        left: 10px !important;
+        right: 10px !important;
+
+        width: auto !important;
+        max-width: none !important;
+
+        min-height: 62px !important;
+
+        margin: 0 !important;
+        padding: 6px 4px !important;
+
+        overflow: visible !important;
+
+        border-radius: 17px !important;
+
+        background: rgba(5, 10, 21, 0.985) !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24) !important;
+
+        z-index: 5000 !important;
+    }
+
+
+    .site-navbar .container-fluid {
+        position: relative !important;
+
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+
+        width: 100% !important;
+
+        gap: 8px !important;
+    }
+
+
+    /* -------------------------------------------------------
+       BRAND
+    -------------------------------------------------------- */
+
+    .cinema-brand,
+    .site-navbar .navbar-brand {
+        flex: 1 1 auto !important;
+
+        min-width: 0 !important;
+
+        margin: 0 auto 0 0 !important;
+
+        color: #ffffff !important;
+
+        opacity: 1 !important;
+
+        font-size: 18px !important;
+        font-weight: 750 !important;
+
+        line-height: 1.2 !important;
+
+        white-space: nowrap !important;
+
+        text-decoration: none !important;
+    }
+
+
+    /* -------------------------------------------------------
+       BACKGROUND MODE - ADMIN
+    -------------------------------------------------------- */
+
+    .site-navbar .navbar-background-mode {
+        flex: 0 0 auto !important;
+
+        margin: 0 !important;
+
+        opacity: 1 !important;
+
+        background: rgba(20, 29, 47, 0.96) !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    }
+
+
+    .site-navbar .navbar-background-mode .video-mode-label {
+        display: none !important;
+    }
+
+
+    .site-navbar .navbar-background-mode .video-mode-select {
+        width: 76px !important;
+        min-width: 76px !important;
+
+        height: 34px !important;
+
+        margin: 0 !important;
+
+        color: #111827 !important;
+
+        background: #f8fafc !important;
+
+        opacity: 1 !important;
+    }
+
+
+    /* -------------------------------------------------------
+       HAMBURGER BUTTON
+    -------------------------------------------------------- */
+
+    .cinema-mobile-toggler {
+        position: relative !important;
+
+        display: block !important;
+
+        flex: 0 0 44px !important;
+
+        width: 44px !important;
+        height: 44px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        opacity: 1 !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+
+        border-radius: 12px !important;
+
+        background: rgba(18, 28, 47, 0.98) !important;
+
+        box-shadow: none !important;
+
+        z-index: 5100 !important;
+    }
+
+
+    .cinema-mobile-toggler:hover,
+    .cinema-mobile-toggler:active,
+    .cinema-mobile-toggler:focus {
+        background: rgba(27, 40, 64, 1) !important;
+
+        border-color: rgba(255, 255, 255, 0.28) !important;
+
+        outline: none !important;
+
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.07) !important;
+    }
+
+
+    .cinema-mobile-toggler span {
+        position: absolute !important;
+
+        left: 10px !important;
+
+        width: 22px !important;
+        height: 2px !important;
+
+        border-radius: 99px !important;
+
+        background: #ffffff !important;
+
+        opacity: 1 !important;
+
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.15) !important;
+
+        transition:
+            top 0.2s ease,
+            transform 0.2s ease,
+            opacity 0.2s ease !important;
+    }
+
+
+    .cinema-mobile-toggler span:nth-child(1) {
+        top: 13px !important;
+    }
+
+
+    .cinema-mobile-toggler span:nth-child(2) {
+        top: 20px !important;
+    }
+
+
+    .cinema-mobile-toggler span:nth-child(3) {
+        top: 27px !important;
+    }
+
+
+    .cinema-mobile-toggler.is-open span:nth-child(1) {
+        top: 20px !important;
+
+        transform: rotate(45deg) !important;
+    }
+
+
+    .cinema-mobile-toggler.is-open span:nth-child(2) {
+        opacity: 0 !important;
+    }
+
+
+    .cinema-mobile-toggler.is-open span:nth-child(3) {
+        top: 20px !important;
+
+        transform: rotate(-45deg) !important;
+    }
+
+
+    /* -------------------------------------------------------
+       COLLAPSE / DROPDOWN MENU
+
+       Quan trọng:
+       Ép thành panel ngang đầy đủ ngay dưới navbar.
+    -------------------------------------------------------- */
+
+    .site-navbar .cinema-navbar-collapse,
+    .site-navbar #mainNavbar {
+        position: absolute !important;
+
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: calc(100svh - 100px) !important;
+
+        margin: 0 !important;
+        padding: 8px !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        border-radius: 15px !important;
+
+        background: rgba(7, 13, 25, 0.995) !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.42) !important;
+
+        opacity: 1 !important;
+
+        z-index: 5050 !important;
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+
+    /* Khi collapse đang đóng */
+    .site-navbar .cinema-navbar-collapse:not(.show),
+    .site-navbar #mainNavbar:not(.show) {
+        background: transparent !important;
+    }
+
+
+    /* -------------------------------------------------------
+       NAV LINKS
+    -------------------------------------------------------- */
+
+    .cinema-nav-links,
+    .site-navbar .navbar-nav {
+        display: flex !important;
+
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        width: 100% !important;
+
+        gap: 3px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        opacity: 1 !important;
+    }
+
+
+    .cinema-nav-links .nav-link,
+    .site-navbar #mainNavbar .nav-link {
+        position: relative !important;
+
+        display: flex !important;
+
+        align-items: center !important;
+
+        width: 100% !important;
+
+        min-height: 44px !important;
+
+        margin: 0 !important;
+        padding: 10px 12px !important;
+
+        border-radius: 10px !important;
+
+        color: #f8fafc !important;
+
+        background: transparent !important;
+
+        opacity: 1 !important;
+
+        font-size: 15px !important;
+        font-weight: 550 !important;
+
+        line-height: 1.2 !important;
+
+        text-decoration: none !important;
+
+        text-shadow: none !important;
+
+        visibility: visible !important;
+    }
+
+
+    .cinema-nav-links .nav-link:hover,
+    .cinema-nav-links .nav-link:focus,
+    .cinema-nav-links .nav-link:active,
+    .site-navbar #mainNavbar .nav-link:hover,
+    .site-navbar #mainNavbar .nav-link:focus,
+    .site-navbar #mainNavbar .nav-link:active {
+        color: #ffffff !important;
+
+        background: rgba(255, 255, 255, 0.075) !important;
+
+        opacity: 1 !important;
+    }
+
+
+    .cinema-nav-links .admin-link,
+    .site-navbar #mainNavbar .admin-link {
+        color: #f1f5f9 !important;
+    }
+
+
+    /* -------------------------------------------------------
+       USER BADGE
+    -------------------------------------------------------- */
+
+    .cinema-nav-links .user-badge,
+    .site-navbar #mainNavbar .user-badge {
+        display: inline-flex !important;
+
+        align-items: center !important;
+
+        align-self: flex-start !important;
+
+        gap: 5px !important;
+
+        min-height: 40px !important;
+
+        margin: 4px 4px 5px !important;
+        padding: 8px 11px !important;
+
+        border-radius: 999px !important;
+
+        color: #f8fafc !important;
+
+        background: rgba(255, 255, 255, 0.055) !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.13) !important;
+
+        opacity: 1 !important;
+
+        font-size: 14px !important;
+
+        visibility: visible !important;
+    }
+
+
+    .cinema-nav-links .user-badge b,
+    .site-navbar #mainNavbar .user-badge b {
+        color: #ffc34f !important;
+
+        opacity: 1 !important;
+    }
+
+
+    /* -------------------------------------------------------
+       Không tạo lớp tối toàn trang khi mở menu
+    -------------------------------------------------------- */
+
+    body::before,
+    body::after,
+    .site-stage::before,
+    .site-stage::after {
+        pointer-events: none !important;
+    }
+
+
+    /* -------------------------------------------------------
+       PAGE / STAGE
+    -------------------------------------------------------- */
+
+    .site-stage {
+        width: calc(100% - 16px) !important;
+        max-width: none !important;
+
+        margin:
+            calc(82px + env(safe-area-inset-top))
+            8px
+            12px !important;
+
+        overflow: visible !important;
+
+        border-radius: 16px !important;
+    }
+
+
+    .stage-content {
+        position: relative !important;
+
+        z-index: 2 !important;
+
+        width: 100% !important;
+
+        padding: 10px !important;
+    }
+
+
+    /* -------------------------------------------------------
+       Tránh text trong page bị dim khi menu mở
+    -------------------------------------------------------- */
+
+    .site-stage,
+    .stage-content,
+    .stage-content * {
+        filter: none !important;
+    }
+
+
+    /* -------------------------------------------------------
+       MODAL/CONFIRM vẫn cao hơn menu
+    -------------------------------------------------------- */
+
+    .cancel-confirm-overlay {
+        z-index: 10000 !important;
+    }
+
+}
+
+
+/* ===========================================================
+   NARROW 9:16 PHONES
+=========================================================== */
+
+@media (max-width: 430px) {
+
+    .site-navbar {
+        left: 8px !important;
+        right: 8px !important;
+    }
+
+
+    .cinema-brand,
+    .site-navbar .navbar-brand {
+        font-size: 16px !important;
+    }
+
+
+    .site-navbar .navbar-background-mode .video-mode-select {
+        width: 68px !important;
+        min-width: 68px !important;
+
+        font-size: 11px !important;
+    }
+
+
+    .site-navbar .cinema-navbar-collapse,
+    .site-navbar #mainNavbar {
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+
+        padding: 7px !important;
+    }
+
+
+    .cinema-nav-links .nav-link,
+    .site-navbar #mainNavbar .nav-link {
+        min-height: 43px !important;
+
+        padding: 9px 11px !important;
+
+        font-size: 15px !important;
+    }
+
+}
+
+
+/* ===========================================================
+   VERY SMALL PHONE
+=========================================================== */
+
+@media (max-width: 360px) {
+
+    .cinema-brand,
+    .site-navbar .navbar-brand {
+        font-size: 15px !important;
+    }
+
+
+    .cinema-mobile-toggler {
+        flex-basis: 42px !important;
+
+        width: 42px !important;
+        height: 42px !important;
+    }
+
+}

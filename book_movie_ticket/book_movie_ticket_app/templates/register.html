@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Đăng ký{% endblock %}
+{% block content %}
+<div class="form-box">
+    <h2>Đăng ký</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-success" type="submit">Tạo tài khoản</button>
+    </form>
+</div>
+{% endblock %}

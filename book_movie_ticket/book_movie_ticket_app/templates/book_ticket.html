@@ -1,0 +1,1345 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Đặt vé - {{ showtime.movie.title }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="booking-page-live">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="booking-live-header">
+
+        <div>
+
+            <div class="booking-kicker">
+                ĐẶT VÉ TRỰC TUYẾN
+            </div>
+
+            <h1>
+                {{ showtime.movie.title }}
+            </h1>
+
+            <div class="booking-subtitle">
+
+                {{ showtime.start_time|date:"d/m/Y H:i" }}
+
+                ·
+
+                {{ showtime.room.name }}
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="liveConnectionBadge"
+            class="live-connection-badge connecting"
+        >
+
+            ● Đang kết nối live
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         BOOKING FORM
+    ====================================================== -->
+
+    <form
+        method="post"
+        id="bookingForm"
+    >
+
+        {% csrf_token %}
+
+
+        <!-- =================================================
+             TICKET TYPE
+        ================================================== -->
+
+        <div class="ticket-type-row">
+
+            <label
+                for="ticketType"
+            >
+                Loại vé
+            </label>
+
+
+            <select
+                name="ticket_type"
+                id="ticketType"
+                class="ticket-type-select"
+            >
+
+                <option value="Adult">
+                    Người lớn - 100.000đ
+                </option>
+
+                <option value="Child">
+                    Trẻ em - 50.000đ
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- =================================================
+             CINEMA ROOM
+        ================================================== -->
+
+        <div class="cinema-room live-cinema-room">
+
+
+            <div class="cinema-screen-wrap">
+
+                <div class="cinema-screen">
+                    MÀN HÌNH
+                </div>
+
+                <div class="screen-light"></div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 LEGEND
+            ============================================== -->
+
+            <div class="seat-legend-live">
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-seat available"
+                    ></span>
+
+                    Trống
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-seat mine"
+                    ></span>
+
+                    Bạn đang chọn
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-seat holding"
+                    ></span>
+
+                    Người khác đang chọn
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-seat booked"
+                    ></span>
+
+                    Đã đặt
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 STATUS
+            ============================================== -->
+
+            <div
+                id="liveSeatMessage"
+                class="live-seat-message"
+            >
+
+                Chọn ghế bạn muốn đặt.
+
+            </div>
+
+
+
+            <!-- =============================================
+                 SEATS
+            ============================================== -->
+
+            <div
+                id="cinemaSeatGrid"
+                class="cinema-seat-grid-live"
+            >
+
+
+                {% for seat in seats %}
+
+
+                    <label
+                        class="
+                            live-seat
+
+                            {% if seat.id in booked_seat_ids %}
+                                booked
+                            {% else %}
+                                available
+                            {% endif %}
+                        "
+
+                        data-seat-id="{{ seat.id }}"
+
+                        title="Ghế {{ seat.number }}"
+                    >
+
+
+                        <input
+                            type="checkbox"
+                            name="seats"
+                            value="{{ seat.id }}"
+
+                            {% if seat.id in booked_seat_ids %}
+                                disabled
+                            {% endif %}
+                        >
+
+
+                        <span class="seat-back">
+
+                            {{ seat.number }}
+
+                        </span>
+
+
+                        <span class="seat-base"></span>
+
+
+                    </label>
+
+
+                {% empty %}
+
+                    <p>
+                        Phòng chưa có ghế.
+                    </p>
+
+                {% endfor %}
+
+
+            </div>
+
+
+
+            <!-- =============================================
+                 SUMMARY
+            ============================================== -->
+
+            <div class="booking-summary-live">
+
+
+                <div>
+
+                    <div class="summary-label">
+                        Ghế đã chọn
+                    </div>
+
+                    <div
+                        id="selectedSeatNames"
+                        class="summary-value"
+                    >
+                        Chưa chọn
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div class="summary-label">
+                        Số lượng
+                    </div>
+
+                    <div
+                        id="selectedSeatCount"
+                        class="summary-value"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="bookNowButton"
+                    class="btn btn-cinema book-now-button"
+                    disabled
+                >
+
+                    Xác nhận đặt vé
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
+
+
+<script>
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    function() {
+
+
+        const actionUrl =
+            "{% url 'seat_live_action' showtime.id %}";
+
+
+        const streamUrl =
+            "{% url 'seat_live_stream' showtime.id %}";
+
+
+        const csrfToken =
+            document.querySelector(
+                "#bookingForm [name=csrfmiddlewaretoken]"
+            ).value;
+
+
+        const seats = Array.from(
+
+            document.querySelectorAll(
+                ".live-seat"
+            )
+
+        );
+
+
+        const grid =
+            document.getElementById(
+                "cinemaSeatGrid"
+            );
+
+
+        const liveMessage =
+            document.getElementById(
+                "liveSeatMessage"
+            );
+
+
+        const connectionBadge =
+            document.getElementById(
+                "liveConnectionBadge"
+            );
+
+
+        const selectedNames =
+            document.getElementById(
+                "selectedSeatNames"
+            );
+
+
+        const selectedCount =
+            document.getElementById(
+                "selectedSeatCount"
+            );
+
+
+        const bookButton =
+            document.getElementById(
+                "bookNowButton"
+            );
+
+
+        const bookingForm =
+            document.getElementById(
+                "bookingForm"
+            );
+
+
+        let latestBooked =
+            new Set();
+
+
+        let latestHeld =
+            new Set();
+
+
+        let latestMine =
+            new Set();
+
+
+        let submitting =
+            false;
+
+
+
+        /* =====================================================
+           GRID RESPONSIVE
+        ====================================================== */
+
+        function updateGridColumns() {
+
+
+            const width =
+                window.innerWidth;
+
+
+            const count =
+                seats.length;
+
+
+            let columns;
+
+
+            if (width <= 430) {
+
+                /*
+                    Điện thoại 9:16:
+                    ưu tiên 4 ghế / dòng.
+                */
+
+                columns =
+                    4;
+
+            }
+            else if (width <= 700) {
+
+                columns =
+                    5;
+
+            }
+            else {
+
+                if (count <= 8) {
+
+                    columns = 4;
+
+                }
+                else if (count <= 12) {
+
+                    columns = 6;
+
+                }
+                else if (count <= 16) {
+
+                    columns = 8;
+
+                }
+                else if (count <= 20) {
+
+                    columns = 10;
+
+                }
+                else {
+
+                    columns = 12;
+
+                }
+
+            }
+
+
+            grid.style.setProperty(
+                "--seat-columns",
+                columns
+            );
+
+        }
+
+
+        updateGridColumns();
+
+
+        window.addEventListener(
+            "resize",
+            updateGridColumns
+        );
+
+
+
+        /* =====================================================
+           HELPERS
+        ====================================================== */
+
+        function seatIdOf(
+            seatElement
+        ) {
+
+            return Number(
+                seatElement.dataset.seatId
+            );
+
+        }
+
+
+        function checkboxOf(
+            seatElement
+        ) {
+
+            return seatElement.querySelector(
+                'input[type="checkbox"]'
+            );
+
+        }
+
+
+        function seatNameOf(
+            seatElement
+        ) {
+
+            return seatElement
+                .querySelector(
+                    ".seat-back"
+                )
+                .textContent
+                .trim();
+
+        }
+
+
+        function selectedSeatIds() {
+
+            return seats
+
+                .filter(
+                    seatElement => {
+
+                        const checkbox =
+                            checkboxOf(
+                                seatElement
+                            );
+
+                        return (
+                            checkbox.checked
+                            &&
+                            !checkbox.disabled
+                        );
+
+                    }
+                )
+
+                .map(
+                    seatIdOf
+                );
+
+        }
+
+
+
+        /* =====================================================
+           SUMMARY
+        ====================================================== */
+
+        function updateSummary() {
+
+
+            const selectedSeats = seats
+
+                .filter(
+                    seatElement => {
+
+                        const checkbox =
+                            checkboxOf(
+                                seatElement
+                            );
+
+                        return (
+                            checkbox.checked
+                            &&
+                            !checkbox.disabled
+                        );
+
+                    }
+                );
+
+
+            const names =
+                selectedSeats.map(
+                    seatNameOf
+                );
+
+
+            selectedCount.textContent =
+                names.length;
+
+
+            selectedNames.textContent =
+
+                names.length
+
+                ?
+
+                names.join(
+                    ", "
+                )
+
+                :
+
+                "Chưa chọn";
+
+
+            bookButton.disabled =
+                names.length === 0;
+
+        }
+
+
+
+        /* =====================================================
+           APPLY LIVE SNAPSHOT
+        ====================================================== */
+
+        function applySnapshot(
+            data
+        ) {
+
+
+            latestBooked =
+                new Set(
+                    data.booked.map(Number)
+                );
+
+
+            latestHeld =
+                new Set(
+                    data.held.map(Number)
+                );
+
+
+            latestMine =
+                new Set(
+                    data.mine.map(Number)
+                );
+
+
+            let otherHoldCount = 0;
+
+
+            seats.forEach(
+
+                seatElement => {
+
+
+                    const id =
+                        seatIdOf(
+                            seatElement
+                        );
+
+
+                    const checkbox =
+                        checkboxOf(
+                            seatElement
+                        );
+
+
+                    seatElement.classList.remove(
+
+                        "available",
+                        "mine",
+                        "holding",
+                        "booked"
+
+                    );
+
+
+                    /* =========================================
+                       ĐÃ ĐẶT
+                    ========================================== */
+
+                    if (
+                        latestBooked.has(
+                            id
+                        )
+                    ) {
+
+
+                        seatElement.classList.add(
+                            "booked"
+                        );
+
+
+                        checkbox.checked =
+                            false;
+
+
+                        checkbox.disabled =
+                            true;
+
+
+                        return;
+
+                    }
+
+
+
+                    /* =========================================
+                       NGƯỜI KHÁC ĐANG CHỌN
+                    ========================================== */
+
+                    if (
+                        latestHeld.has(
+                            id
+                        )
+                    ) {
+
+
+                        seatElement.classList.add(
+                            "holding"
+                        );
+
+
+                        checkbox.checked =
+                            false;
+
+
+                        checkbox.disabled =
+                            true;
+
+
+                        otherHoldCount++;
+
+
+                        return;
+
+                    }
+
+
+
+                    /* =========================================
+                       GHẾ CỦA MÌNH
+                    ========================================== */
+
+                    if (
+                        latestMine.has(
+                            id
+                        )
+                    ) {
+
+
+                        seatElement.classList.add(
+                            "mine"
+                        );
+
+
+                        checkbox.disabled =
+                            false;
+
+
+                        checkbox.checked =
+                            true;
+
+
+                        return;
+
+                    }
+
+
+
+                    /* =========================================
+                       TRỐNG
+                    ========================================== */
+
+                    seatElement.classList.add(
+                        "available"
+                    );
+
+
+                    checkbox.disabled =
+                        false;
+
+
+                }
+
+            );
+
+
+            if (otherHoldCount > 0) {
+
+                liveMessage.textContent =
+
+                    `${otherHoldCount} ghế đang được người khác chọn. Trạng thái được cập nhật trực tiếp.`;
+
+            }
+            else {
+
+                liveMessage.textContent =
+
+                    "Ghế đang được đồng bộ trực tiếp. Bạn không cần tải lại trang.";
+
+            }
+
+
+            updateSummary();
+
+        }
+
+
+
+        /* =====================================================
+           POST ACTION
+        ====================================================== */
+
+        async function sendAction(
+            action,
+            seatId = null
+        ) {
+
+
+            const body =
+                new URLSearchParams();
+
+
+            body.append(
+                "action",
+                action
+            );
+
+
+            if (seatId !== null) {
+
+                body.append(
+                    "seat_id",
+                    seatId
+                );
+
+            }
+
+
+            const response = await fetch(
+
+                actionUrl,
+
+                {
+
+                    method:
+                        "POST",
+
+                    cache:
+                        "no-store",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded;charset=UTF-8",
+
+                        "X-CSRFToken":
+                            csrfToken,
+
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+
+                    },
+
+                    body:
+                        body.toString(),
+
+                }
+
+            );
+
+
+            let data = {};
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            }
+            catch (error) {
+
+            }
+
+
+            return {
+                response,
+                data,
+            };
+
+        }
+
+
+
+        /* =====================================================
+           SEAT CLICK
+        ====================================================== */
+
+        seats.forEach(
+
+            seatElement => {
+
+
+                const checkbox =
+                    checkboxOf(
+                        seatElement
+                    );
+
+
+                checkbox.addEventListener(
+
+                    "change",
+
+                    async function() {
+
+
+                        const seatId =
+                            seatIdOf(
+                                seatElement
+                            );
+
+
+                        if (
+                            checkbox.checked
+                        ) {
+
+
+                            /*
+                                Optimistic UI.
+                            */
+
+                            seatElement.classList.remove(
+                                "available"
+                            );
+
+
+                            seatElement.classList.add(
+                                "mine"
+                            );
+
+
+                            const result =
+                                await sendAction(
+                                    "hold",
+                                    seatId
+                                );
+
+
+                            if (
+                                !result.response.ok
+                                ||
+                                !result.data.ok
+                            ) {
+
+
+                                checkbox.checked =
+                                    false;
+
+
+                                seatElement.classList.remove(
+                                    "mine"
+                                );
+
+
+                                if (
+                                    result.data.state
+                                    ===
+                                    "booked"
+                                ) {
+
+
+                                    seatElement.classList.add(
+                                        "booked"
+                                    );
+
+
+                                    checkbox.disabled =
+                                        true;
+
+
+                                    liveMessage.textContent =
+                                        "Ghế này vừa được đặt bởi người khác.";
+
+                                }
+                                else {
+
+
+                                    seatElement.classList.add(
+                                        "holding"
+                                    );
+
+
+                                    checkbox.disabled =
+                                        true;
+
+
+                                    liveMessage.textContent =
+                                        "Ghế này đang được người khác chọn.";
+
+                                }
+
+
+                            }
+
+
+                        }
+                        else {
+
+
+                            seatElement.classList.remove(
+                                "mine"
+                            );
+
+
+                            seatElement.classList.add(
+                                "available"
+                            );
+
+
+                            await sendAction(
+                                "release",
+                                seatId
+                            );
+
+
+                        }
+
+
+                        updateSummary();
+
+
+                    }
+
+                );
+
+
+            }
+
+        );
+
+
+
+        /* =====================================================
+           SERVER-SENT EVENTS
+        ====================================================== */
+
+        function connectLiveStream() {
+
+
+            const eventSource =
+                new EventSource(
+                    streamUrl
+                );
+
+
+            connectionBadge.className =
+                "live-connection-badge connecting";
+
+
+            connectionBadge.textContent =
+                "● Đang kết nối live";
+
+
+            eventSource.onopen =
+                function() {
+
+
+                    connectionBadge.className =
+                        "live-connection-badge online";
+
+
+                    connectionBadge.textContent =
+                        "● Live";
+
+
+                };
+
+
+            eventSource.onmessage =
+                function(event) {
+
+
+                    try {
+
+
+                        const data =
+                            JSON.parse(
+                                event.data
+                            );
+
+
+                        applySnapshot(
+                            data
+                        );
+
+
+                    }
+                    catch (error) {
+
+
+                        console.error(
+                            "Live seat data error:",
+                            error
+                        );
+
+
+                    }
+
+
+                };
+
+
+            eventSource.onerror =
+                function() {
+
+
+                    connectionBadge.className =
+                        "live-connection-badge connecting";
+
+
+                    connectionBadge.textContent =
+                        "● Đang kết nối lại";
+
+
+                    /*
+                        EventSource tự reconnect.
+                    */
+
+
+                };
+
+
+            return eventSource;
+
+        }
+
+
+        const seatEventSource =
+            connectLiveStream();
+
+
+
+        /* =====================================================
+           HEARTBEAT
+
+           Giữ ghế của user không hết hạn khi họ
+           vẫn đang ngồi ở trang đặt vé.
+        ====================================================== */
+
+        setInterval(
+
+            async function() {
+
+
+                if (submitting) {
+
+                    return;
+
+                }
+
+
+                const ids =
+                    selectedSeatIds();
+
+
+                if (
+                    ids.length === 0
+                ) {
+
+                    return;
+
+                }
+
+
+                const body =
+                    new URLSearchParams();
+
+
+                body.append(
+                    "action",
+                    "heartbeat"
+                );
+
+
+                ids.forEach(
+                    id => {
+
+                        body.append(
+                            "seat_ids",
+                            id
+                        );
+
+                    }
+                );
+
+
+                try {
+
+                    await fetch(
+
+                        actionUrl,
+
+                        {
+
+                            method:
+                                "POST",
+
+                            cache:
+                                "no-store",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded;charset=UTF-8",
+
+                                "X-CSRFToken":
+                                    csrfToken,
+
+                            },
+
+                            body:
+                                body.toString(),
+
+                        }
+
+                    );
+
+                }
+                catch (error) {
+
+                }
+
+
+            },
+
+            10000
+
+        );
+
+
+
+        /* =====================================================
+           SUBMIT
+        ====================================================== */
+
+        bookingForm.addEventListener(
+
+            "submit",
+
+            function(event) {
+
+
+                if (
+                    selectedSeatIds()
+                    .length === 0
+                ) {
+
+
+                    event.preventDefault();
+
+                    liveMessage.textContent =
+                        "Bạn chưa chọn ghế.";
+
+                    return;
+
+                }
+
+
+                submitting =
+                    true;
+
+
+                bookButton.disabled =
+                    true;
+
+
+                bookButton.textContent =
+                    "Đang đặt vé...";
+
+
+            }
+
+        );
+
+
+
+        /* =====================================================
+           RỜI TRANG -> RELEASE HOLD
+        ====================================================== */
+
+        window.addEventListener(
+
+            "pagehide",
+
+            function() {
+
+
+                if (submitting) {
+
+                    return;
+
+                }
+
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "action",
+                    "release_all"
+                );
+
+
+                formData.append(
+                    "csrfmiddlewaretoken",
+                    csrfToken
+                );
+
+
+                navigator.sendBeacon(
+                    actionUrl,
+                    formData
+                );
+
+
+                seatEventSource.close();
+
+
+            }
+
+        );
+
+
+    }
+
+);
+
+</script>
+
+
+{% endblock %}

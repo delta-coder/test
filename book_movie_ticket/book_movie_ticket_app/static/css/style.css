@@ -1,0 +1,1320 @@
+:root {
+    --app-bg: #090d17;
+
+    --stage-border: rgba(255, 255, 255, 0.08);
+    --panel-bg: rgba(8, 16, 34, 0.24);
+    --panel-bg-strong: rgba(8, 16, 34, 0.34);
+    --panel-border: rgba(255, 255, 255, 0.10);
+
+    --text-main: #f5f7ff;
+    --text-soft: #d5deef;
+    --text-muted: #9ca9c4;
+
+    --accent: #e74a60;
+    --accent-hover: #cb3349;
+    --highlight: #ffc75f;
+
+    --seat-free-top: #b72c35;
+    --seat-free-bottom: #7b1219;
+    --seat-free-border: #d33b44;
+
+    --seat-selected-top: #2abf75;
+    --seat-selected-bottom: #177a49;
+    --seat-selected-border: #4fe39b;
+
+    --seat-booked-top: #68707b;
+    --seat-booked-bottom: #434951;
+    --seat-booked-border: #818894;
+}
+
+/* =========================
+   GLOBAL
+========================= */
+html, body {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--app-bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* =========================
+   TOP BAR - nằm ngoài background
+========================= */
+.site-navbar {
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 44px);
+    max-width: 1500px;
+    z-index: 2000;
+
+    background: rgba(7, 12, 24, 0.84);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+
+    backdrop-filter: blur(16px) saturate(135%);
+    -webkit-backdrop-filter: blur(16px) saturate(135%);
+
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.site-navbar .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.site-navbar .nav-link {
+    color: var(--text-soft) !important;
+    transition: 0.18s ease;
+    font-size: 1rem;
+}
+
+.site-navbar .nav-link:hover {
+    color: #ffffff !important;
+}
+
+.admin-link {
+    color: var(--highlight) !important;
+    font-weight: 600;
+}
+
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-main);
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.05);
+    border-radius: 999px;
+    padding: 6px 12px;
+    margin: 0 8px;
+    font-size: 14px;
+}
+
+.user-badge b {
+    color: var(--highlight);
+}
+
+/* =========================
+   STAGE - background chỉ trong khung này
+========================= */
+.site-stage {
+    position: relative;
+    width: calc(100% - 44px);
+    max-width: 1500px;
+    min-height: calc(100vh - 120px);
+
+    margin:
+        86px auto 20px;
+
+    border-radius: 26px;
+    overflow: hidden;
+
+    border: 1px solid var(--stage-border);
+    box-shadow:
+        0 22px 50px rgba(0, 0, 0, 0.30);
+
+    background: rgba(255,255,255,0.02);
+}
+
+.stage-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background:
+        url("../images/background.jpg")
+        center center / cover
+        no-repeat;
+}
+
+.stage-background video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: all 0.25s ease;
+}
+
+.stage-background video.video-fit-cover {
+    object-fit: cover;
+}
+
+.stage-background video.video-fit-contain {
+    object-fit: contain;
+    background: #060a13;
+}
+
+.stage-background video.video-fit-fill {
+    object-fit: fill;
+}
+
+.stage-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            rgba(5, 9, 18, 0.14),
+            rgba(5, 9, 18, 0.36)
+        );
+}
+
+/* =========================
+   MODE BOX
+========================= */
+.video-mode-box {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 20;
+
+    background: rgba(8, 14, 28, 0.70);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 10px 12px;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.video-mode-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: var(--text-soft);
+}
+
+.video-mode-select {
+    min-width: 112px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.96);
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+/* =========================
+   CONTENT
+========================= */
+.stage-content {
+    position: relative;
+    z-index: 5;
+    padding: 28px 26px 38px;
+    min-height: calc(100vh - 120px);
+}
+
+/* =========================
+   COMMON GLASS PANELS
+========================= */
+.form-box,
+.movie-card,
+.detail-box,
+.table-box,
+.booking-box,
+.hero-home-box,
+.home-feature-card,
+.hero-box,
+.showtime-item {
+    background: rgba(8, 16, 34, 0.12);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 20px;
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-cinema,
+.confirm-booking-btn,
+.movie-card .btn,
+.detail-box .btn,
+.showtime-item .btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    border: 1px solid var(--accent);
+    color: #ffffff !important;
+    border-radius: 11px;
+    transition: 0.18s ease;
+}
+
+.btn-cinema:hover,
+.confirm-booking-btn:hover,
+.movie-card .btn:hover,
+.detail-box .btn:hover,
+.showtime-item .btn:hover {
+    background: linear-gradient(135deg, var(--accent-hover), #ae263b);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.site-back-btn {
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(8, 14, 28, 0.62);
+    color: #ffffff;
+    padding: 9px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.18s ease;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.site-back-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+/* =========================
+   HOME
+========================= */
+.hero-home {
+    min-height: 58vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-home-box {
+    max-width: 920px;
+    width: 100%;
+    padding: 48px 40px;
+    text-align: center;
+
+    background: rgba(7, 14, 30, 0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.hero-mini-title {
+    color: var(--highlight);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-size: 0.96rem;
+}
+
+.hero-main-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: #ffffff;
+}
+
+.hero-description {
+    color: var(--text-soft);
+    max-width: 680px;
+    margin: 0 auto 24px;
+    font-size: 1.08rem;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.home-feature-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.home-feature-card {
+    padding: 24px 20px;
+}
+
+.home-feature-card h3 {
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-size: 1.24rem;
+}
+
+.home-feature-card {
+    padding: 24px 20px;
+
+    background: rgba(7, 14, 30, 0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* =========================
+   MOVIE LIST / CARD
+========================= */
+.hero-box {
+    padding: 28px 24px;
+    margin-bottom: 26px;
+    border-left: 4px solid var(--accent);
+}
+
+.hero-box h1,
+.hero-box h2 {
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.hero-box p {
+    color: var(--text-soft);
+    margin-bottom: 0;
+}
+
+.movie-card {
+    overflow: hidden;
+    height: 100%;
+    transition: transform 0.20s ease, box-shadow 0.20s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.22);
+}
+
+.movie-poster {
+    width: 100%;
+    height: 390px;
+    object-fit: cover;
+    background: #121827;
+}
+
+.movie-card .card-body {
+    background: transparent;
+    color: var(--text-main);
+}
+
+.movie-card .card-title {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.movie-card .movie-info,
+.movie-card p,
+.movie-card small {
+    color: var(--text-soft);
+}
+
+/* =========================
+   DETAIL PAGE
+========================= */
+.detail-box {
+    padding: 24px;
+}
+
+.detail-poster {
+    width: 100%;
+    max-height: 560px;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.showtime-item {
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    color: var(--text-soft);
+}
+
+/* =========================
+   FORM
+========================= */
+.form-box {
+    max-width: 520px;
+    margin: 25px auto;
+    padding: 25px;
+}
+
+.form-box h2,
+.form-box h3 {
+    color: #ffffff;
+}
+
+.form-box label {
+    color: var(--text-soft);
+    margin-bottom: 6px;
+}
+
+.form-box input,
+.form-box select,
+.form-box textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.96);
+    color: #1b2230;
+}
+
+/* =========================
+   TABLE
+========================= */
+.table-box {
+    padding: 18px;
+    overflow-x: auto;
+}
+
+.table {
+    margin-bottom: 0;
+    --bs-table-bg: rgba(255, 255, 255, 0.95);
+    --bs-table-striped-bg: #ececec;
+    color: #1d2431;
+}
+
+/* =========================
+   BOOKING BOX - trong suốt hơn
+========================= */
+.booking-box {
+    padding: 24px;
+    max-width: 1120px;
+    margin: 0 auto;
+
+    background: rgba(8, 16, 34, 0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.booking-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 15px;
+}
+
+.booking-header h2 {
+    margin-bottom: 14px;
+    color: #ffffff;
+}
+
+.booking-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    color: var(--text-soft);
+}
+
+.ticket-type-area {
+    margin-bottom: 20px;
+}
+
+.ticket-type-area label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.ticket-select {
+    max-width: 280px;
+}
+
+/* =========================
+   CINEMA ROOM - để nền thấy xuyên qua
+========================= */
+.cinema-room {
+    position: relative;
+    margin-top: 20px;
+    min-height: 470px;
+    padding: 35px 30px 45px;
+    border-radius: 22px;
+    overflow: hidden;
+
+    background: rgba(7, 14, 30, 0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    box-shadow:
+        inset 0 0 24px rgba(0,0,0,0.10),
+        0 12px 28px rgba(0,0,0,0.14);
+}
+
+.cinema-screen {
+    width: 72%;
+    max-width: 680px;
+    margin: 0 auto 22px;
+    padding: 13px 15px;
+    text-align: center;
+    color: #121826;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #ffffff, #cfd5df);
+    border-radius:
+        50% 50% 10px 10px /
+        22% 22% 10px 10px;
+    box-shadow:
+        0 8px 18px rgba(255,255,255,0.20),
+        0 10px 22px rgba(0,0,0,0.30);
+}
+
+/* =========================
+   SEAT GUIDE
+========================= */
+.seat-guide {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding: 8px 15px;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+.guide-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.guide-seat {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+}
+
+.guide-seat.available {
+    background: linear-gradient(180deg, var(--seat-free-top), var(--seat-free-bottom));
+    border: 1px solid var(--seat-free-border);
+}
+
+.guide-seat.selected {
+    background: linear-gradient(180deg, var(--seat-selected-top), var(--seat-selected-bottom));
+    border: 1px solid var(--seat-selected-border);
+}
+
+.guide-seat.unavailable {
+    background: linear-gradient(180deg, var(--seat-booked-top), var(--seat-booked-bottom));
+    border: 1px solid var(--seat-booked-border);
+}
+
+.seat-title {
+    text-align: center;
+    margin: 10px 0 18px;
+    color: #ffffff;
+}
+
+/* =========================
+   SEAT GRID
+========================= */
+.cinema-seat-grid {
+    --seat-columns: 8;
+    display: grid;
+    grid-template-columns: repeat(var(--seat-columns), 68px);
+    justify-content: center;
+    gap: 18px 15px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* =========================
+   SEAT STYLE
+========================= */
+.cinema-seat {
+    position: relative;
+    width: 68px;
+    height: 63px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cinema-seat input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.seat-visual {
+    position: relative;
+    display: block;
+    width: 68px;
+    height: 63px;
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.chair-back {
+    position: absolute;
+    top: 3px;
+    left: 7px;
+    width: 54px;
+    height: 38px;
+    border-radius: 10px 10px 7px 7px;
+    background: linear-gradient(180deg, var(--seat-free-top), var(--seat-free-bottom));
+    border: 1px solid var(--seat-free-border);
+    box-shadow:
+        inset 0 -5px 8px rgba(0, 0, 0, 0.25),
+        0 5px 10px rgba(0, 0, 0, 0.30);
+}
+
+.chair-bottom {
+    position: absolute;
+    bottom: 6px;
+    left: 12px;
+    width: 44px;
+    height: 21px;
+    border-radius: 7px 7px 10px 10px;
+    background: linear-gradient(180deg, #8b171f, #5e0d12);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.35);
+}
+
+.seat-number {
+    position: absolute;
+    top: 13px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 5;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.cinema-seat:not(.booked):hover .seat-visual {
+    transform: translateY(-4px) scale(1.05);
+    filter: brightness(1.16);
+}
+
+/* selected */
+.cinema-seat input:checked + .seat-visual .chair-back {
+    background: linear-gradient(180deg, var(--seat-selected-top), var(--seat-selected-bottom));
+    border-color: var(--seat-selected-border);
+}
+
+.cinema-seat input:checked + .seat-visual .chair-bottom {
+    background: linear-gradient(180deg, #1d9759, #116b3e);
+}
+
+.cinema-seat input:checked + .seat-visual {
+    transform: translateY(-5px) scale(1.06);
+    filter: drop-shadow(0 0 9px rgba(51, 226, 136, 0.45));
+}
+
+/* booked */
+.cinema-seat.booked {
+    cursor: not-allowed;
+}
+
+.cinema-seat.booked .chair-back {
+    background: linear-gradient(180deg, var(--seat-booked-top), var(--seat-booked-bottom));
+    border-color: var(--seat-booked-border);
+}
+
+.cinema-seat.booked .chair-bottom {
+    background: #373d45;
+}
+
+.cinema-seat.booked .seat-number {
+    color: #d1d4d9;
+}
+
+.cinema-seat.booked .seat-visual {
+    opacity: 0.66;
+}
+
+/* =========================
+   EXIT
+========================= */
+.cinema-exit {
+    width: fit-content;
+    margin: 25px auto 0;
+    padding: 5px 15px;
+    color: rgba(255,255,255,0.55);
+    border-top: 1px solid rgba(255,255,255,0.18);
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 991px) {
+    .user-badge {
+        margin: 6px 0;
+        width: fit-content;
+    }
+
+    .movie-poster {
+        height: 330px;
+    }
+
+    .cinema-seat-grid {
+        grid-template-columns: repeat(6, 64px) !important;
+    }
+
+    .home-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .site-navbar {
+        width: calc(100% - 26px);
+    }
+
+    .site-stage {
+        width: calc(100% - 26px);
+    }
+}
+
+@media (max-width: 700px) {
+    .site-navbar {
+        top: 10px;
+    }
+
+    .site-stage {
+        margin-top: 80px;
+        border-radius: 20px;
+    }
+
+    .stage-content {
+        padding: 18px 14px 28px;
+    }
+
+    .hero-home-box {
+        padding: 28px 20px;
+    }
+
+    .hero-main-title {
+        font-size: 2.3rem;
+    }
+
+    .booking-box {
+        padding: 15px;
+    }
+
+    .cinema-room {
+        padding: 25px 10px 35px;
+    }
+
+    .cinema-screen {
+        width: 90%;
+    }
+
+    .cinema-seat-grid {
+        grid-template-columns: repeat(4, 60px) !important;
+        gap: 14px 10px;
+    }
+
+    .cinema-seat,
+    .seat-visual {
+        width: 60px;
+        height: 58px;
+    }
+
+    .chair-back {
+        left: 6px;
+        width: 48px;
+        height: 35px;
+    }
+
+    .chair-bottom {
+        left: 10px;
+        width: 40px;
+    }
+
+    .booking-info {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .video-mode-box {
+        top: 14px;
+        right: 14px;
+        padding: 8px 10px;
+    }
+}
+/* ==================================================
+   BACKGROUND PLAYLIST SYSTEM
+   JPG 3s -> MP4 12s
+================================================== */
+
+.stage-background {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #050913;
+}
+
+
+/* media chung */
+
+.background-media {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        opacity 0.65s ease;
+
+    will-change:
+        opacity;
+
+    transform:
+        translateZ(0);
+}
+
+
+/* JPG */
+
+.background-image {
+    z-index: 1;
+
+    opacity: 1;
+}
+
+
+/* MP4 */
+
+.background-video {
+    z-index: 2;
+
+    opacity: 0;
+
+    background: #050913;
+}
+
+
+/* lớp tối rất nhẹ
+
+   Không dùng blur ở đây
+   để giữ chất lượng ảnh/video
+*/
+
+.stage-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 3;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            rgba(3, 7, 16, 0.08),
+            rgba(3, 7, 16, 0.20)
+        );
+
+    backdrop-filter: none !important;
+
+    -webkit-backdrop-filter:
+        none !important;
+}
+
+
+/* ==================================================
+   PANEL TRONG SUỐT
+================================================== */
+
+.hero-home-box,
+.home-feature-card,
+.booking-box,
+.cinema-room,
+.movie-card,
+.detail-box,
+.form-box,
+.table-box,
+.showtime-item {
+
+    background:
+        rgba(
+            6,
+            13,
+            30,
+            0.10
+        ) !important;
+
+
+    backdrop-filter:
+        none !important;
+
+
+    -webkit-backdrop-filter:
+        none !important;
+
+
+    border:
+
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.11
+        );
+
+
+    box-shadow:
+
+        0
+        10px
+        25px
+        rgba(
+            0,
+            0,
+            0,
+            0.13
+        );
+
+}
+
+
+/* navbar vẫn là khung riêng */
+
+.site-navbar {
+
+    background:
+        rgba(
+            6,
+            11,
+            22,
+            0.94
+        ) !important;
+
+
+    backdrop-filter:
+        none !important;
+
+
+    -webkit-backdrop-filter:
+        none !important;
+
+}
+/* =========================================================
+   FIXED BACKGROUND FRAME
+   Background luôn nằm cố định phía dưới Navbar
+   Nội dung website cuộn phía trên background
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   SITE STAGE
+--------------------------------------------------------- */
+
+.site-stage {
+    position: relative !important;
+
+    /*
+        Background đã chuyển sang fixed,
+        vì vậy stage không cần cắt background nữa.
+    */
+    overflow: visible !important;
+
+    /*
+        Giữ stage nằm đúng vị trí dưới navbar.
+    */
+    background: transparent !important;
+}
+
+
+/* ---------------------------------------------------------
+   KHUNG BACKGROUND CỐ ĐỊNH
+--------------------------------------------------------- */
+
+.stage-background {
+
+    /*
+        Quan trọng nhất:
+        background bám theo viewport,
+        không chạy theo chiều dài trang.
+    */
+    position: fixed !important;
+
+
+    /*
+        Navbar của chúng ta nằm phía trên.
+
+        Khoảng 84px giúp background
+        bắt đầu ngay dưới navbar.
+    */
+    top: 84px !important;
+
+
+    /*
+        Canh giữa màn hình
+    */
+    left: 50% !important;
+
+    transform: translateX(-50%) !important;
+
+
+    /*
+        Cùng chiều rộng với khung website.
+    */
+    width: calc(100% - 44px) !important;
+
+    max-width: 1500px !important;
+
+
+    /*
+        Chiều cao cố định theo màn hình.
+
+        100vh = toàn bộ chiều cao browser.
+        Trừ navbar + khoảng cách phía dưới.
+    */
+    height: calc(100vh - 104px) !important;
+
+
+    /*
+        Không cho background vượt ra ngoài khung bo góc.
+    */
+    overflow: hidden !important;
+
+
+    /*
+        Bo góc giống giao diện hiện tại.
+    */
+    border-radius: 20px !important;
+
+
+    /*
+        Background luôn nằm sau nội dung.
+    */
+    z-index: 0 !important;
+
+
+    /*
+        Nền đen khi dùng Contain
+        và video/ảnh không phủ đủ hai bên.
+    */
+    background: #050914 !important;
+
+
+    /*
+        Không bắt chuột.
+        Người dùng vẫn click được card,
+        nút đặt vé...
+    */
+    pointer-events: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   IMAGE / VIDEO
+--------------------------------------------------------- */
+
+.background-media {
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+
+    /*
+        object-fit vẫn do Background mode
+        Cover / Contain / Fill điều khiển.
+    */
+    object-position: center center !important;
+
+
+    /*
+        Giữ chuyển ảnh/video mượt.
+    */
+    transition:
+        opacity 0.65s ease !important;
+
+
+    /*
+        Hỗ trợ render video mượt hơn.
+    */
+    will-change: opacity !important;
+}
+
+
+/* ---------------------------------------------------------
+   OVERLAY
+--------------------------------------------------------- */
+
+.stage-overlay {
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+
+    /*
+        Chỉ phủ nhẹ.
+        Không blur background.
+    */
+    background:
+        linear-gradient(
+            180deg,
+            rgba(4, 8, 18, 0.06) 0%,
+            rgba(4, 8, 18, 0.12) 55%,
+            rgba(4, 8, 18, 0.20) 100%
+        ) !important;
+
+
+    backdrop-filter: none !important;
+
+    -webkit-backdrop-filter: none !important;
+
+
+    pointer-events: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   NỘI DUNG WEBSITE
+
+   Đẩy toàn bộ nội dung lên phía trên background.
+--------------------------------------------------------- */
+
+.stage-content {
+
+    position: relative !important;
+
+    z-index: 2 !important;
+
+    /*
+        Không cần background riêng ở đây.
+    */
+    background: transparent !important;
+}
+
+
+/* ---------------------------------------------------------
+   BACKGROUND MODE
+
+   Admin vẫn chỉnh được và hộp này
+   cũng nằm trên background.
+--------------------------------------------------------- */
+
+.video-mode-box {
+
+    position: fixed !important;
+
+    top: 98px !important;
+
+    /*
+        Canh theo khung website.
+    */
+    right: max(
+        34px,
+        calc((100vw - 1500px) / 2 + 18px)
+    ) !important;
+
+
+    z-index: 50 !important;
+}
+
+
+/* ---------------------------------------------------------
+   NAVBAR
+
+   Navbar luôn cao hơn background.
+--------------------------------------------------------- */
+
+.site-navbar {
+
+    z-index: 1000 !important;
+}
+
+
+/* =========================================================
+   PANEL / CARD
+
+   Giữ trong suốt để nhìn thấy background cố định phía sau.
+========================================================= */
+
+.hero-home-box,
+.home-feature-card,
+.hero-box,
+.booking-box,
+.cinema-room,
+.movie-card,
+.detail-box,
+.form-box,
+.table-box,
+.showtime-item {
+
+    /*
+        Trong suốt nhẹ.
+    */
+    background:
+        rgba(6, 13, 30, 0.20) !important;
+
+
+    /*
+        Không blur background.
+    */
+    backdrop-filter:
+        none !important;
+
+    -webkit-backdrop-filter:
+        none !important;
+
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.11) !important;
+
+
+    box-shadow:
+        0 10px 25px
+        rgba(0, 0, 0, 0.12) !important;
+}
+
+
+/* =========================================================
+   MOBILE / MÀN HÌNH NHỎ
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .stage-background {
+
+        top: 74px !important;
+
+        width:
+            calc(100% - 16px) !important;
+
+        height:
+            calc(100vh - 90px) !important;
+
+        border-radius:
+            15px !important;
+
+    }
+
+
+    .video-mode-box {
+
+        top:
+            86px !important;
+
+        right:
+            16px !important;
+
+    }
+
+}

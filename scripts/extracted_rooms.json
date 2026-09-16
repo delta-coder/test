@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "Phòng 1",
+    "capacity": 16
+  },
+  {
+    "id": 2,
+    "name": "Phòng 2",
+    "capacity": 12
+  },
+  {
+    "id": 3,
+    "name": "Phòng 3",
+    "capacity": 20
+  },
+  {
+    "id": 4,
+    "name": "Phòng 4",
+    "capacity": 24
+  },
+  {
+    "id": 5,
+    "name": "Phòng 5",
+    "capacity": 16
+  }
+]

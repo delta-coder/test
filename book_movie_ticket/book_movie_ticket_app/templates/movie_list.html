@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Phim
+{% endblock %}
+
+
+{% block content %}
+
+
+<style>
+
+    /* =========================================================
+       DANH SÁCH PHIM - COMPACT 5 CỘT
+    ========================================================= */
+
+    .movie-grid-page {
+        width: 100%;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .movie-grid-page .movie-list-header {
+
+        margin-bottom: 20px;
+
+        padding: 22px 24px;
+
+        border-radius: 18px;
+
+        background:
+            rgba(6, 13, 30, 0.18);
+
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.10);
+
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+
+    .movie-grid-page .movie-list-header h1 {
+
+        margin: 0 0 5px 0;
+
+        font-size: 30px;
+
+        font-weight: 700;
+    }
+
+
+    .movie-grid-page .movie-list-header p {
+
+        margin: 0;
+
+        font-size: 14px;
+
+        opacity: 0.82;
+    }
+
+
+
+    /* =========================================================
+       GRID
+
+       Desktop:
+       5 phim / dòng
+    ========================================================= */
+
+    .movie-grid-compact {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                5,
+                minmax(0, 1fr)
+            );
+
+        gap: 18px;
+
+        width: 100%;
+    }
+
+
+
+    /* =========================================================
+       CARD
+    ========================================================= */
+
+    .movie-grid-compact .movie-card {
+
+        width: 100%;
+
+        min-width: 0;
+
+        overflow: hidden;
+
+        border-radius: 16px;
+
+        background:
+            rgba(7, 15, 32, 0.30) !important;
+
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.11);
+
+        box-shadow:
+            0 8px 20px
+            rgba(0, 0, 0, 0.13);
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        transition:
+            transform 0.20s ease,
+            border-color 0.20s ease,
+            box-shadow 0.20s ease;
+    }
+
+
+    .movie-grid-compact .movie-card:hover {
+
+        transform:
+            translateY(-4px);
+
+        border-color:
+            rgba(255, 255, 255, 0.22);
+
+        box-shadow:
+            0 12px 28px
+            rgba(0, 0, 0, 0.20);
+    }
+
+
+
+    /* =========================================================
+       POSTER
+
+       Card cũ khoảng 390px rộng.
+       Card mới chỉ khoảng 210-240px.
+
+       Poster dùng tỷ lệ 3:4
+       để vẫn giữ dáng poster điện ảnh.
+    ========================================================= */
+
+    .movie-grid-compact .movie-poster {
+
+        display: block;
+
+        width: 100% !important;
+
+        aspect-ratio:
+            3 / 4;
+
+        height: auto !important;
+
+        object-fit:
+            cover !important;
+
+        object-position:
+            center center;
+
+        border-radius:
+            15px 15px 0 0;
+
+        margin: 0 !important;
+    }
+
+
+
+    /* =========================================================
+       PHẦN THÔNG TIN
+    ========================================================= */
+
+    .movie-grid-compact .card-body {
+
+        padding:
+            13px 13px 14px;
+
+        min-height:
+            150px;
+
+        display: flex;
+
+        flex-direction:
+            column;
+    }
+
+
+
+    /* =========================================================
+       TÊN PHIM
+    ========================================================= */
+
+    .movie-grid-compact .card-title {
+
+        margin:
+            0 0 7px 0;
+
+        font-size:
+            16px;
+
+        line-height:
+            1.25;
+
+        font-weight:
+            700;
+
+        color:
+            white;
+
+
+        /*
+            Tối đa 2 dòng.
+            Tên quá dài sẽ ...
+        */
+
+        display:
+            -webkit-box;
+
+        -webkit-line-clamp:
+            2;
+
+        line-clamp:
+            2;
+
+        -webkit-box-orient:
+            vertical;
+
+        overflow:
+            hidden;
+    }
+
+
+
+    /* =========================================================
+       THÔNG TIN
+    ========================================================= */
+
+    .movie-grid-compact .movie-info {
+
+        margin:
+            0 0 7px 0;
+
+        font-size:
+            12.5px;
+
+        line-height:
+            1.4;
+
+        color:
+            rgba(
+                255,
+                255,
+                255,
+                0.82
+            );
+    }
+
+
+
+    /* Đạo diễn quá dài thì thu gọn */
+
+    .movie-grid-compact
+    .movie-director {
+
+        white-space:
+            nowrap;
+
+        overflow:
+            hidden;
+
+        text-overflow:
+            ellipsis;
+    }
+
+
+
+    /* =========================================================
+       BUTTON
+    ========================================================= */
+
+    .movie-grid-compact .movie-detail-button {
+
+        margin-top:
+            auto;
+
+        align-self:
+            flex-start;
+
+        padding:
+            7px 12px;
+
+        font-size:
+            12.5px;
+
+        border-radius:
+            10px;
+    }
+
+
+
+    /* =========================================================
+       RESPONSIVE
+
+       Desktop lớn = 5
+       Laptop vừa = 5
+       Tablet = 3
+       Phone ngang = 2
+       Phone nhỏ = 1
+    ========================================================= */
+
+
+    /* Laptop / Desktop */
+
+    @media (
+        min-width: 1100px
+    ) {
+
+        .movie-grid-compact {
+
+            grid-template-columns:
+                repeat(
+                    5,
+                    minmax(0, 1fr)
+                );
+
+        }
+
+    }
+
+
+
+    /* Tablet lớn */
+
+    @media (
+        min-width: 800px
+    )
+    and
+    (
+        max-width: 1099px
+    ) {
+
+        .movie-grid-compact {
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    minmax(0, 1fr)
+                );
+
+        }
+
+    }
+
+
+
+    /* Tablet */
+
+    @media (
+        min-width: 600px
+    )
+    and
+    (
+        max-width: 799px
+    ) {
+
+        .movie-grid-compact {
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(0, 1fr)
+                );
+
+        }
+
+    }
+
+
+
+    /* Điện thoại */
+
+    @media (
+        min-width: 400px
+    )
+    and
+    (
+        max-width: 599px
+    ) {
+
+        .movie-grid-compact {
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+
+        }
+
+    }
+
+
+
+    /* Điện thoại rất nhỏ */
+
+    @media (
+        max-width: 399px
+    ) {
+
+        .movie-grid-compact {
+
+            grid-template-columns:
+                1fr;
+
+        }
+
+    }
+
+
+</style>
+
+
+
+<div class="movie-grid-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="movie-list-header">
+
+        <h1>
+            Danh sách phim
+        </h1>
+
+        <p>
+            Các phim hiện có trong hệ thống.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MOVIE GRID
+    ====================================================== -->
+
+    <div class="movie-grid-compact">
+
+
+        {% for movie in movies %}
+
+
+            <div class="movie-card">
+
+
+                <!-- POSTER -->
+
+                <img
+                    src="{{ movie.cover_image }}"
+                    class="movie-poster"
+                    alt="{{ movie.title }}"
+                >
+
+
+
+                <!-- INFORMATION -->
+
+                <div class="card-body">
+
+
+                    <!-- TITLE -->
+
+                    <h5 class="card-title">
+
+                        {{ movie.title }}
+
+                    </h5>
+
+
+
+                    <!-- GENRE -->
+
+                    <p class="movie-info">
+
+                        {{ movie.genre }}
+
+                        ·
+
+                        {{ movie.duration }} phút
+
+                    </p>
+
+
+
+                    <!-- DIRECTOR -->
+
+                    <p
+                        class="
+                            movie-info
+                            movie-director
+                        "
+                        title="{{ movie.director }}"
+                    >
+
+                        Đạo diễn:
+                        {{ movie.director }}
+
+                    </p>
+
+
+
+                    <!-- DETAIL -->
+
+                    <a
+                        href="{% url 'movie_detail' movie.id %}"
+                        class="
+                            btn
+                            btn-cinema
+                            movie-detail-button
+                        "
+                    >
+
+                        Chi tiết
+
+                    </a>
+
+
+                </div>
+
+
+            </div>
+
+
+        {% empty %}
+
+
+            <p>
+                Chưa có phim trong hệ thống.
+            </p>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

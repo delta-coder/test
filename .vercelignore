@@ -1,0 +1,30 @@
+# Ignore large media and legacy Django project
+book_movie_ticket/
+scripts/
+
+# Ignore Python virtual environment
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Ignore local database
+*.sqlite3
+cinema.db
+*.db
+
+# Ignore video files
+*.mp4
+*.mkv
+*.avi
+
+# Ignore git and IDE
+.git/
+.cursor/
+.vscode/
+.idea/
+
+# Ignore logs
+*.log
+.cinema_server_status.json

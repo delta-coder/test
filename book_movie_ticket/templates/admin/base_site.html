@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quản trị Cinema Booking{% endblock %}
+
+{% block branding %}
+<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+    <h1 id="site-name" style="margin:0;">
+        <a href="{% url 'admin:index' %}">Quản trị Cinema Booking</a>
+    </h1>
+
+    <button type="button" onclick="goBackAdmin()"
+            style="padding:7px 12px; border:0; border-radius:5px; cursor:pointer;">
+        ← Quay lại
+    </button>
+
+    <a href="/"
+       style="padding:7px 12px; background:#417690; color:white; border-radius:5px; text-decoration:none;">
+        🏠 Về trang web
+    </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<script>
+function goBackAdmin() {
+    if (document.referrer) {
+        try {
+            const previous = new URL(document.referrer);
+            if (previous.origin === window.location.origin) {
+                history.back();
+                return;
+            }
+        } catch (error) {}
+    }
+    window.location.href = "/";
+}
+
+document.addEventListener("keydown", function(event) {
+    const key = event.key.toLowerCase();
+
+    // Ctrl + Alt + H: về trang chủ
+    if (event.ctrlKey && event.altKey && key === "h") {
+        event.preventDefault();
+        window.location.href = "/";
+    }
+
+    // Ctrl + Alt + B: quay lại
+    if (event.ctrlKey && event.altKey && key === "b") {
+        event.preventDefault();
+        goBackAdmin();
+    }
+});
+</script>
+{% endblock %}
