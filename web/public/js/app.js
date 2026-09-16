@@ -10,7 +10,6 @@ let allShowtimes = [];
 let selectedGenre = 'all';
 let searchQuery = '';
 let selectedScheduleDate = null;
-let seatEventSource = null;
 let seatPollingInterval = null;
 
 let seatData = {
@@ -29,11 +28,11 @@ function showAlert(message, type = 'info') {
     const container = document.getElementById('alertContainer');
     if (!container) return;
     const alert = document.createElement('div');
-    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.className = `alert alert-${type}`;
     alert.role = 'alert';
     alert.innerHTML = `
         <span>${message}</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(alert);
     setTimeout(() => {
@@ -52,12 +51,6 @@ function showPage(pageId) {
         targetPage.style.display = 'block';
     }
 
-    // Toggle global back button
-    const backBtn = document.getElementById('globalBackBtn');
-    if (backBtn) {
-        backBtn.style.display = (pageId === 'homePage') ? 'none' : 'inline-flex';
-    }
-
     // Update active nav link
     document.querySelectorAll('.cinema-nav-links .nav-link').forEach(link => {
         link.classList.remove('active');
@@ -72,14 +65,17 @@ function showPage(pageId) {
         }
     });
 
+    // Close mobile nav if open
+    const navCollapse = document.getElementById('mainNavbar');
+    if (navCollapse) navCollapse.classList.remove('show');
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function goBack() {
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        showPage('homePage');
+function toggleMobileNav() {
+    const navCollapse = document.getElementById('mainNavbar');
+    if (navCollapse) {
+        navCollapse.classList.toggle('show');
     }
 }
 
@@ -101,7 +97,7 @@ async function fetchAPI(endpoint, options = {}) {
         currentUser = null;
         updateAuthUI();
         if (options.requireAuth) {
-            showPage('loginPage');
+            openAuthModal('login');
             showAlert('Vui lòng đăng nhập để tiếp tục thao tác.', 'warning');
         }
         return null;
@@ -116,7 +112,7 @@ async function fetchAPI(endpoint, options = {}) {
 }
 
 // ==========================================================================
-// AUTHENTICATION
+// AUTHENTICATION & MODAL
 // ==========================================================================
 
 function updateAuthUI() {
@@ -148,57 +144,116 @@ function updateAuthUI() {
 async function checkAuth() {
     try {
         const user = await fetchAPI('/auth/me');
-        if (user) {
-            currentUser = user;
-        } else {
-            currentUser = null;
-        }
+        currentUser = user || null;
     } catch (e) {
         currentUser = null;
     }
     updateAuthUI();
 }
 
-async function login(username, password) {
+function openAuthModal(tab = 'login') {
+    const overlay = document.getElementById('authModalOverlay');
+    const alertEl = document.getElementById('modalAuthAlert');
+    if (alertEl) alertEl.style.display = 'none';
+    if (overlay) overlay.style.display = 'flex';
+    switchAuthTab(tab);
+}
+
+function closeAuthModal() {
+    const overlay = document.getElementById('authModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+    const loginForm = document.getElementById('modalLoginForm');
+    const regForm = document.getElementById('modalRegisterForm');
+    const tabLoginBtn = document.getElementById('tabLoginBtn');
+    const tabRegBtn = document.getElementById('tabRegisterBtn');
+    const alertEl = document.getElementById('modalAuthAlert');
+    if (alertEl) alertEl.style.display = 'none';
+
+    if (tab === 'login') {
+        if (loginForm) loginForm.style.display = 'block';
+        if (regForm) regForm.style.display = 'none';
+        if (tabLoginBtn) tabLoginBtn.classList.add('active');
+        if (tabRegBtn) tabRegBtn.classList.remove('active');
+    } else {
+        if (loginForm) loginForm.style.display = 'none';
+        if (regForm) regForm.style.display = 'block';
+        if (tabLoginBtn) tabLoginBtn.classList.remove('active');
+        if (tabRegBtn) tabRegBtn.classList.add('active');
+    }
+}
+
+function quickFillModalAdmin() {
+    const u = document.getElementById('modalLoginUser');
+    const p = document.getElementById('modalLoginPass');
+    if (u) u.value = 'admin';
+    if (p) p.value = '123';
+}
+
+function quickFillAdmin() {
+    const u = document.getElementById('loginUsername');
+    const p = document.getElementById('loginPassword');
+    if (u) u.value = 'admin';
+    if (p) p.value = '123';
+}
+
+async function handleModalLogin(e) {
+    if (e) e.preventDefault();
+    const u = document.getElementById('modalLoginUser')?.value.trim();
+    const p = document.getElementById('modalLoginPass')?.value.trim();
+    const alertEl = document.getElementById('modalAuthAlert');
+
+    if (!u || !p) return;
+
     try {
         const user = await fetchAPI('/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username: u, password: p })
         });
         if (user) {
             currentUser = user;
             updateAuthUI();
-            showAlert(`Chào mừng bạn quay lại, ${currentUser.name || currentUser.username}!`, 'success');
-            showPage('homePage');
-            loadMovies();
+            closeAuthModal();
+            showAlert(`Chào mừng bạn, ${currentUser.name || currentUser.username}! Đăng nhập thành công.`, 'success');
+            
+            // If user was on booking page, reload booking
+            if (currentShowtimeId && document.getElementById('bookingPage').style.display === 'block') {
+                loadBookingPage(currentShowtimeId);
+            }
         }
-    } catch (e) {
-        const errBox = document.getElementById('loginError');
-        if (errBox) {
-            errBox.textContent = e.message;
-            errBox.style.display = 'block';
+    } catch (err) {
+        if (alertEl) {
+            alertEl.textContent = err.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';
+            alertEl.style.display = 'block';
         }
     }
 }
 
-async function register(data) {
+async function handleModalRegister(e) {
+    if (e) e.preventDefault();
+    const u = document.getElementById('modalRegUser')?.value.trim();
+    const email = document.getElementById('modalRegEmail')?.value.trim();
+    const name = document.getElementById('modalRegName')?.value.trim();
+    const p = document.getElementById('modalRegPass')?.value.trim();
+    const alertEl = document.getElementById('modalAuthAlert');
+
     try {
         const user = await fetchAPI('/auth/register', {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify({ username: u, email, name, password: p })
         });
         if (user) {
             currentUser = user;
             updateAuthUI();
+            closeAuthModal();
             showAlert('Tạo tài khoản thành công! Bạn có thể đặt vé ngay bây giờ.', 'success');
-            showPage('homePage');
-            loadMovies();
         }
-    } catch (e) {
-        const errBox = document.getElementById('registerError');
-        if (errBox) {
-            errBox.textContent = e.message;
-            errBox.style.display = 'block';
+    } catch (err) {
+        if (alertEl) {
+            alertEl.textContent = err.message || 'Lỗi khi tạo tài khoản.';
+            alertEl.style.display = 'block';
         }
     }
 }
@@ -209,7 +264,7 @@ async function logout() {
     } catch (e) {}
     currentUser = null;
     updateAuthUI();
-    showAlert('Đã đăng xuất thành công.', 'info');
+    showAlert('Đã đăng xuất tài khoản.', 'info');
     showPage('homePage');
 }
 
@@ -231,7 +286,7 @@ async function loadMovies() {
 function renderHeroSpotlight(movies) {
     if (!movies || movies.length === 0) return;
     
-    // Choose Oppenheimer or first movie
+    // Default featured: Oppenheimer or first movie
     const spotlightMovie = movies.find(m => m.title.toLowerCase().includes('oppenheimer')) || movies[0];
     
     const heroTitle = document.getElementById('heroTitle');
@@ -251,16 +306,10 @@ function renderHeroSpotlight(movies) {
     }
 
     if (heroBookBtn) {
-        heroBookBtn.onclick = (e) => {
-            e.preventDefault();
-            loadMovieDetail(spotlightMovie.id);
-        };
+        heroBookBtn.onclick = () => loadMovieDetail(spotlightMovie.id);
     }
     if (heroDetailBtn) {
-        heroDetailBtn.onclick = (e) => {
-            e.preventDefault();
-            loadMovieDetail(spotlightMovie.id);
-        };
+        heroDetailBtn.onclick = () => loadMovieDetail(spotlightMovie.id);
     }
 }
 
@@ -294,8 +343,8 @@ function renderMoviesGrid(gridId, movies) {
 
     if (!movies || movies.length === 0) {
         grid.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <p class="text-muted fs-5">Không tìm thấy bộ phim nào phù hợp với từ khóa.</p>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Không tìm thấy bộ phim nào phù hợp với từ khóa.</p>
             </div>
         `;
         return;
@@ -327,6 +376,68 @@ function renderMoviesGrid(gridId, movies) {
             </div>
         </div>
     `).join('');
+}
+
+// ==========================================================================
+// MOVIE DETAIL PAGE (COMPACT POSTER ON LEFT, INFO & SHOWTIMES ON RIGHT)
+// ==========================================================================
+
+async function loadMovieDetail(movieId) {
+    try {
+        const [movie, showtimes] = await Promise.all([
+            fetchAPI(`/movies/${movieId}`),
+            fetchAPI(`/movies/${movieId}/showtimes`)
+        ]);
+
+        currentMovie = movie;
+
+        const posterEl = document.getElementById('moviePoster');
+        if (posterEl) {
+            posterEl.src = movie.poster_url || '/images/default.jpg';
+            posterEl.alt = movie.title;
+        }
+
+        document.getElementById('movieTitle').textContent = movie.title;
+        document.getElementById('movieGenre').textContent = movie.genre;
+        document.getElementById('movieDuration').textContent = movie.duration;
+        document.getElementById('movieDirector').textContent = movie.director;
+        document.getElementById('movieReleaseDate').textContent = new Date(movie.release_date).toLocaleDateString('vi-VN');
+        document.getElementById('movieDescription').textContent = movie.description;
+
+        const breadcrumb = document.getElementById('detailBreadcrumb');
+        if (breadcrumb) breadcrumb.textContent = `Trang chủ / Chi tiết phim: ${movie.title}`;
+
+        renderMovieDetailShowtimes(showtimes);
+        showPage('movieDetailPage');
+    } catch (e) {
+        showAlert('Không thể tải chi tiết phim: ' + e.message, 'danger');
+    }
+}
+
+function renderMovieDetailShowtimes(showtimes) {
+    const container = document.getElementById('showtimesContainer');
+    if (!container) return;
+
+    if (!showtimes || showtimes.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.95rem;">Hiện chưa có suất chiếu nào cho bộ phim này.</p>';
+        return;
+    }
+
+    container.innerHTML = showtimes.map(st => {
+        const dateStr = new Date(st.start_time).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const timeStr = new Date(st.start_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        return `
+            <div class="detail-showtime-item">
+                <div class="detail-showtime-info">
+                    <div class="st-time">${timeStr} <span class="st-date-badge">${dateStr}</span></div>
+                    <div class="st-room">${st.room_name || 'Phòng chiếu tiêu chuẩn'}</div>
+                </div>
+                <button type="button" class="btn btn-cinema btn-sm" onclick="loadBookingPage(${st.id})">
+                    Chọn ghế
+                </button>
+            </div>
+        `;
+    }).join('');
 }
 
 // ==========================================================================
@@ -392,7 +503,6 @@ function renderScheduleList() {
     const listContainer = document.getElementById('scheduleList');
     if (!listContainer) return;
 
-    // Filter showtimes for selected date
     const dateShowtimes = allShowtimes.filter(st => {
         const stDate = new Date(st.start_time).toISOString().split('T')[0];
         return stDate === selectedScheduleDate;
@@ -400,14 +510,13 @@ function renderScheduleList() {
 
     if (dateShowtimes.length === 0) {
         listContainer.innerHTML = `
-            <div class="text-center py-5">
-                <p class="text-muted fs-5">Chưa có suất chiếu nào được lên lịch cho ngày này.</p>
+            <div style="text-align: center; padding: 40px 0;">
+                <p style="color: var(--text-muted); font-size: 1.05rem;">Chưa có suất chiếu nào được lên lịch cho ngày này.</p>
             </div>
         `;
         return;
     }
 
-    // Group showtimes by movie
     const groupedByMovie = {};
     dateShowtimes.forEach(st => {
         if (!groupedByMovie[st.movie_id]) {
@@ -452,77 +561,14 @@ function renderScheduleList() {
 }
 
 // ==========================================================================
-// MOVIE DETAIL PAGE
-// ==========================================================================
-
-async function loadMovieDetail(movieId) {
-    try {
-        const [movie, showtimes] = await Promise.all([
-            fetchAPI(`/movies/${movieId}`),
-            fetchAPI(`/movies/${movieId}/showtimes`)
-        ]);
-
-        currentMovie = movie;
-
-        const posterEl = document.getElementById('moviePoster');
-        if (posterEl) {
-            posterEl.src = movie.poster_url || '/images/default.jpg';
-            posterEl.alt = movie.title;
-        }
-
-        document.getElementById('movieTitle').textContent = movie.title;
-        document.getElementById('movieGenre').textContent = movie.genre;
-        document.getElementById('movieDuration').textContent = movie.duration;
-        document.getElementById('movieDirector').textContent = movie.director;
-        document.getElementById('movieReleaseDate').textContent = new Date(movie.release_date).toLocaleDateString('vi-VN');
-        document.getElementById('movieDescription').textContent = movie.description;
-
-        const glowEl = document.getElementById('detailBackdropGlow');
-        if (glowEl && movie.poster_url) {
-            glowEl.style.backgroundImage = `radial-gradient(circle, rgba(229, 9, 20, 0.25) 0%, rgba(0, 0, 0, 0) 70%)`;
-        }
-
-        renderMovieDetailShowtimes(showtimes);
-        showPage('movieDetailPage');
-    } catch (e) {
-        showAlert('Không thể tải chi tiết phim: ' + e.message, 'danger');
-    }
-}
-
-function renderMovieDetailShowtimes(showtimes) {
-    const container = document.getElementById('showtimesContainer');
-    if (!container) return;
-
-    if (!showtimes || showtimes.length === 0) {
-        container.innerHTML = '<p class="text-muted">Hiện chưa có suất chiếu nào cho bộ phim này.</p>';
-        return;
-    }
-
-    container.innerHTML = showtimes.map(st => {
-        const dateStr = new Date(st.start_time).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' });
-        const timeStr = new Date(st.start_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-        return `
-            <div class="detail-showtime-item">
-                <div class="detail-showtime-info">
-                    <div class="st-time">${timeStr} <span class="badge bg-secondary ms-2">${dateStr}</span></div>
-                    <div class="st-room">${st.room_name || 'Phòng chiếu tiêu chuẩn'}</div>
-                </div>
-                <button type="button" class="btn btn-cinema btn-sm" onclick="loadBookingPage(${st.id})">
-                    Chọn ghế
-                </button>
-            </div>
-        `;
-    }).join('');
-}
-
-// ==========================================================================
 // BOOKING PAGE & SEAT SELECTION
 // ==========================================================================
 
 async function loadBookingPage(showtimeId) {
     if (!currentUser) {
         showAlert('Vui lòng đăng nhập để tiến hành đặt ghế.', 'warning');
-        showPage('loginPage');
+        currentShowtimeId = showtimeId;
+        openAuthModal('login');
         return;
     }
 
@@ -551,6 +597,14 @@ async function loadBookingPage(showtimeId) {
     }
 }
 
+function goBackFromBooking() {
+    if (currentMovie && currentMovie.id) {
+        loadMovieDetail(currentMovie.id);
+    } else {
+        showPage('homePage');
+    }
+}
+
 function renderSeats(snapshot) {
     seatData = {
         booked: new Set(snapshot.booked || []),
@@ -560,13 +614,13 @@ function renderSeats(snapshot) {
 
     const grid = document.getElementById('cinemaSeatGrid');
     if (!snapshot.seats || snapshot.seats.length === 0) {
-        grid.innerHTML = '<p class="text-muted">Phòng chiếu này chưa được cấu hình sơ đồ ghế.</p>';
+        grid.innerHTML = '<p style="color: var(--text-muted);">Phòng chiếu này chưa được cấu hình sơ đồ ghế.</p>';
         return;
     }
 
     seats = snapshot.seats;
     
-    // Calculate row and columns (default 6 seats per row, or 5 depending on capacity)
+    // Calculate columns per row based on capacity
     const capacity = seats.length;
     let cols = 6;
     if (capacity % 5 === 0 && capacity <= 20) cols = 5;
@@ -588,7 +642,7 @@ function renderSeats(snapshot) {
             <div class="seat-row-label">${rowLetter}</div>
             <div class="seat-row-seats">
                 ${rowMap[rowLetter].map(seat => {
-                    let statusClass = 'available';
+                    let statusClass = '';
                     let isDisabled = false;
 
                     if (seatData.booked.has(seat.id)) {
@@ -732,26 +786,23 @@ function setupLiveSeatSync(showtimeId) {
             if (snapshot) {
                 seatData.booked = new Set(snapshot.booked || []);
                 seatData.held = new Set(snapshot.held || []);
-                // Keep mine
                 snapshot.seats?.forEach(s => updateSeatElementState(s.id));
                 updateBookingSummary();
             }
         } catch (e) {}
     }, 4000);
-
-    const badge = document.getElementById('liveConnectionBadge');
-    if (badge) {
-        badge.className = 'live-connection-badge connected';
-        badge.innerHTML = '● Đang kết nối trực tiếp';
-    }
 }
 
-// Handle Booking Form Submit
-document.getElementById('bookingForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
+// Execute Booking action
+async function executeBooking() {
     if (!currentShowtimeId || seatData.mine.size === 0) {
         showAlert('Vui lòng chọn ít nhất 1 ghế để tiếp tục.', 'warning');
+        return;
+    }
+
+    if (!currentUser) {
+        openAuthModal('login');
+        showAlert('Vui lòng đăng nhập để hoàn tất đặt vé.', 'warning');
         return;
     }
 
@@ -784,7 +835,7 @@ document.getElementById('bookingForm')?.addEventListener('submit', async (e) => 
             bookBtn.textContent = 'Xác nhận đặt vé';
         }
     }
-});
+}
 
 // Ticket type change recalculates price
 document.getElementById('ticketType')?.addEventListener('change', updateBookingSummary);
@@ -796,7 +847,7 @@ document.getElementById('ticketType')?.addEventListener('change', updateBookingS
 async function loadMyTickets() {
     if (!currentUser) {
         showAlert('Vui lòng đăng nhập để xem vé của bạn.', 'warning');
-        showPage('loginPage');
+        openAuthModal('login');
         return;
     }
 
@@ -815,11 +866,11 @@ function renderMyTickets(tickets) {
 
     if (!tickets || tickets.length === 0) {
         grid.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <p class="text-muted fs-5">Bạn chưa đặt vé nào trong hệ thống.</p>
-                <a href="#movies" class="btn btn-cinema mt-3" onclick="showPage('moviesPage')">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Bạn chưa đặt vé nào trong hệ thống.</p>
+                <button type="button" class="btn btn-cinema" style="margin-top: 14px;" onclick="showPage('homePage')">
                     Khám phá phim đang chiếu
-                </a>
+                </button>
             </div>
         `;
         return;
@@ -829,7 +880,7 @@ function renderMyTickets(tickets) {
         const dateStr = new Date(t.start_time).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
         const timeStr = new Date(t.start_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
         
-        // Calculate seat code A-D
+        // Calculate seat code
         const seatNum = t.seat_number || 1;
         const rowLetter = String.fromCharCode(65 + Math.floor((seatNum - 1) / 6));
         const colNum = ((seatNum - 1) % 6) + 1;
@@ -846,7 +897,7 @@ function renderMyTickets(tickets) {
                     <div class="ticket-details">
                         <h4 class="ticket-movie-title">${t.movie_title}</h4>
                         <div class="ticket-info-item">🎬 Phòng: <strong>${t.room_name}</strong></div>
-                        <div class="ticket-info-item">📅 Suất chiếu: <strong>${timeStr} · ${dateStr}</strong></div>
+                        <div class="ticket-info-item">📅 Suất: <strong>${timeStr} · ${dateStr}</strong></div>
                         <div class="ticket-info-item">💺 Ghế: <strong>${seatCode}</strong> (${t.ticket_type === 'Child' ? 'Trẻ em' : 'Người lớn'})</div>
                     </div>
                 </div>
@@ -918,7 +969,7 @@ function setupFilterEvents() {
         });
     }
 
-    // Genre buttons
+    // Genre buttons on Home and Movies Page
     document.querySelectorAll('.genre-pill').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.genre-pill').forEach(b => b.classList.remove('active'));
@@ -938,60 +989,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadMovies();
     setupFilterEvents();
 
-    // Navigation links handling
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const href = link.getAttribute('href');
-            if (href === '#home' || href === '#' || href === '/') {
-                e.preventDefault();
-                showPage('homePage');
-            } else if (href === '#movies') {
-                e.preventDefault();
-                showPage('moviesPage');
-                applyMovieFilters();
-            } else if (href === '#schedule') {
-                e.preventDefault();
-                loadSchedule();
-            } else if (href === '#tickets') {
-                e.preventDefault();
-                loadMyTickets();
-            } else if (href === '#login') {
-                e.preventDefault();
-                showPage('loginPage');
-            } else if (href === '#register') {
-                e.preventDefault();
-                showPage('registerPage');
-            }
+    // Close auth modal on backdrop click
+    const authOverlay = document.getElementById('authModalOverlay');
+    if (authOverlay) {
+        authOverlay.addEventListener('click', (e) => {
+            if (e.target === authOverlay) closeAuthModal();
         });
-    });
+    }
 
-    // Cancel modal buttons
-    document.getElementById('cancelNoButton')?.addEventListener('click', closeCancelModal);
-    document.getElementById('cancelYesButton')?.addEventListener('click', executeCancelTicket);
-    document.getElementById('cancelConfirmOverlay')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('cancelConfirmOverlay')) closeCancelModal();
-    });
-
-    // Login Form Submit
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const u = document.getElementById('loginUsername').value.trim();
-        const p = document.getElementById('loginPassword').value.trim();
-        login(u, p);
-    });
-
-    // Register Form Submit
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = {
-            username: document.getElementById('regUsername').value.trim(),
-            email: document.getElementById('regEmail').value.trim(),
-            name: document.getElementById('regName').value.trim(),
-            age: document.getElementById('regAge').value ? parseInt(document.getElementById('regAge').value) : null,
-            password: document.getElementById('regPassword').value.trim()
-        };
-        register(data);
-    });
+    // Close cancel modal on backdrop click
+    const cancelOverlay = document.getElementById('cancelConfirmOverlay');
+    if (cancelOverlay) {
+        cancelOverlay.addEventListener('click', (e) => {
+            if (e.target === cancelOverlay) closeCancelModal();
+        });
+    }
 
     // Release held seats when page unloads
     window.addEventListener('pagehide', () => {

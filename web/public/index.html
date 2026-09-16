@@ -10,34 +10,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/mobile_916.css">
-    <link rel="stylesheet" href="/css/mobile_nav_fix.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar site-navbar fixed-top" role="navigation" aria-label="Main navigation">
         <div class="container-fluid px-3">
-            <a class="navbar-brand fw-bold cinema-brand" href="/" aria-label="CineBook Home">
+            <a class="navbar-brand fw-bold cinema-brand" href="/" aria-label="CineBook Home" onclick="event.preventDefault(); showPage('homePage');">
                 <span class="brand-icon">🎬</span> CineBook
             </a>
-            <button class="navbar-toggler cinema-mobile-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Mở menu">
+            <button class="navbar-toggler cinema-mobile-toggler" type="button" onclick="toggleMobileNav()" aria-label="Mở menu">
                 <span></span><span></span><span></span>
             </button>
             <div class="collapse navbar-collapse cinema-navbar-collapse" id="mainNavbar">
                 <div class="navbar-nav ms-auto align-items-lg-center cinema-nav-links">
-                    <a class="nav-link active" href="/" data-nav="home">Trang chủ</a>
-                    <a class="nav-link" href="#movies" data-nav="movies">Phim đang chiếu</a>
-                    <a class="nav-link" href="#schedule" data-nav="schedule">Lịch chiếu</a>
-                    <a class="nav-link" id="myTicketsLink" href="#tickets" style="display:none;" data-nav="tickets">Vé của tôi</a>
+                    <a class="nav-link active" href="/" data-nav="home" onclick="event.preventDefault(); showPage('homePage');">Trang chủ</a>
+                    <a class="nav-link" href="#movies" data-nav="movies" onclick="event.preventDefault(); showPage('moviesPage');">Phim đang chiếu</a>
+                    <a class="nav-link" href="#schedule" data-nav="schedule" onclick="event.preventDefault(); loadSchedule();">Lịch chiếu</a>
+                    <a class="nav-link" id="myTicketsLink" href="#tickets" style="display:none;" data-nav="tickets" onclick="event.preventDefault(); loadMyTickets();">Vé của tôi</a>
                     
                     <div class="nav-auth-group">
                         <span class="user-badge" id="userBadge" style="display:none;">
                             <span class="user-avatar">👤</span>
                             <span id="userName" class="user-name"></span>
                         </span>
-                        <a class="nav-link nav-btn-outline" id="loginLink" href="#login">Đăng nhập</a>
-                        <a class="nav-link nav-btn-solid" id="registerLink" href="#register">Đăng ký</a>
-                        <a class="nav-link nav-btn-logout" id="logoutLink" href="#" style="display:none;" onclick="logout()">Đăng xuất</a>
+                        <button type="button" class="nav-btn nav-btn-outline" id="loginLink" onclick="openAuthModal('login')">Đăng nhập</button>
+                        <button type="button" class="nav-btn nav-btn-solid" id="registerLink" onclick="openAuthModal('register')">Đăng ký</button>
+                        <button type="button" class="nav-btn nav-btn-logout" id="logoutLink" style="display:none;" onclick="logout()">Đăng xuất</button>
                     </div>
                 </div>
             </div>
@@ -51,16 +49,14 @@
             <div class="stage-overlay"></div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Main Content Container -->
         <main class="stage-content">
-            <button type="button" class="site-back-btn mb-3" id="globalBackBtn" onclick="goBack()" style="display:none;">
-                <span class="back-arrow">←</span> Quay lại
-            </button>
+            <!-- Global Alert Container -->
+            <div id="alertContainer" class="alert-toast-container"></div>
 
-            <!-- Alert Container -->
-            <div id="alertContainer"></div>
-
-            <!-- Home Page -->
+            <!-- ============================================================== -->
+            <!-- 1. HOME PAGE                                                   -->
+            <!-- ============================================================== -->
             <section id="homePage">
                 <!-- Hero Spotlight -->
                 <div class="hero-spotlight" id="heroSpotlight">
@@ -77,13 +73,13 @@
                             Kiệt tác điện ảnh đoạt giải Oscar về nhà vật lý J. Robert Oppenheimer - cha đẻ của bom nguyên tử và Dự án Manhattan chấn động lịch sử thế giới.
                         </p>
                         <div class="hero-spotlight-actions">
-                            <a href="#booking" id="heroBookBtn" class="btn btn-cinema btn-glow">Đặt vé ngay</a>
-                            <a href="#movieDetail" id="heroDetailBtn" class="btn btn-outline-glass">Xem chi tiết</a>
+                            <button type="button" id="heroBookBtn" class="btn btn-cinema btn-glow">Đặt vé ngay</button>
+                            <button type="button" id="heroDetailBtn" class="btn btn-outline-glass">Xem chi tiết</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Features Ribbon -->
+                <!-- Features Perks Ribbon -->
                 <div class="cinema-perks-row">
                     <div class="perk-card">
                         <div class="perk-icon">⚡</div>
@@ -108,14 +104,14 @@
                     </div>
                 </div>
 
-                <!-- Movie Catalog Section -->
+                <!-- Catalog Section -->
                 <div class="catalog-header-wrap">
                     <div class="catalog-heading">
                         <h2>Phim đang chiếu tại rạp</h2>
-                        <p class="catalog-sub">Toàn bộ 15 siêu phẩm mới nhất, hình ảnh sắc nét & suất chiếu đa dạng</p>
+                        <p class="catalog-sub">Toàn bộ 15 siêu phẩm với hình ảnh sắc nét, thông tin chi tiết và lịch chiếu phong phú</p>
                     </div>
 
-                    <!-- Search & Filter Controls -->
+                    <!-- Search & Genre Controls -->
                     <div class="movie-controls-bar">
                         <div class="movie-search-wrap">
                             <span class="search-icon">🔍</span>
@@ -133,290 +129,392 @@
                     </div>
                 </div>
 
-                <!-- Movies Grid Container -->
+                <!-- Movie Cards Grid -->
                 <div class="movie-grid-compact" id="homeMoviesGrid">
-                    <!-- Loaded dynamically via JS -->
+                    <!-- Populated dynamically via JS -->
                 </div>
             </section>
 
-            <!-- Movies Page (Dedicated view) -->
+            <!-- ============================================================== -->
+            <!-- 2. MOVIES PAGE (DEDICATED VIEW)                                -->
+            <!-- ============================================================== -->
             <section id="moviesPage" style="display:none;">
-                <div class="movie-grid-page">
-                    <div class="section-title-box">
-                        <span class="section-kicker">DANH MỤC PHIM</span>
-                        <h1>Tất cả phim đang chiếu</h1>
-                        <p>Khám phá toàn bộ danh sách phim và lựa chọn suất chiếu yêu thích của bạn.</p>
-                    </div>
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                    <div class="page-breadcrumb-text">Trang chủ / Danh mục phim</div>
+                </div>
 
-                    <!-- Genre filter on Movies page -->
-                    <div class="genre-filter-pills mb-4" id="moviesPageGenrePills">
-                        <button type="button" class="genre-pill active" data-genre="all">Tất cả</button>
-                        <button type="button" class="genre-pill" data-genre="Hành động">Hành động</button>
-                        <button type="button" class="genre-pill" data-genre="Khoa học viễn tưởng">Viễn tưởng</button>
-                        <button type="button" class="genre-pill" data-genre="Hoạt hình">Hoạt hình</button>
-                        <button type="button" class="genre-pill" data-genre="Phiêu lưu">Phiêu lưu</button>
-                        <button type="button" class="genre-pill" data-genre="Tâm lý">Tâm lý</button>
-                    </div>
+                <div class="section-title-box">
+                    <span class="section-kicker">DANH MỤC PHIM</span>
+                    <h1>Tất cả phim đang chiếu tại rạp</h1>
+                    <p>Khám phá kho phim rạp đa dạng và chọn suất chiếu thuận tiện nhất cho bạn.</p>
+                </div>
 
-                    <div class="movie-grid-compact" id="moviesGrid">
-                        <!-- Loaded dynamically via JS -->
-                    </div>
+                <!-- Genre Filter Pills on Movies Page -->
+                <div class="genre-filter-pills mb-4" id="moviesPageGenrePills">
+                    <button type="button" class="genre-pill active" data-genre="all">Tất cả</button>
+                    <button type="button" class="genre-pill" data-genre="Hành động">Hành động</button>
+                    <button type="button" class="genre-pill" data-genre="Khoa học viễn tưởng">Viễn tưởng</button>
+                    <button type="button" class="genre-pill" data-genre="Hoạt hình">Hoạt hình</button>
+                    <button type="button" class="genre-pill" data-genre="Phiêu lưu">Phiêu lưu</button>
+                    <button type="button" class="genre-pill" data-genre="Tâm lý">Tâm lý</button>
+                </div>
+
+                <div class="movie-grid-compact" id="moviesGrid">
+                    <!-- Populated dynamically via JS -->
                 </div>
             </section>
 
-            <!-- Schedule Page -->
+            <!-- ============================================================== -->
+            <!-- 3. SCHEDULE PAGE (LỊCH CHIẾU CHI TIẾT)                         -->
+            <!-- ============================================================== -->
             <section id="schedulePage" style="display:none;">
-                <div class="schedule-page">
-                    <div class="section-title-box">
-                        <span class="section-kicker">LỊCH CHIẾU CHI TIẾT</span>
-                        <h1>Lịch chiếu phim hôm nay & sắp tới</h1>
-                        <p>Chọn ngày và khung giờ thuận tiện để vào thẳng giao diện chọn ghế trực quan.</p>
-                    </div>
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                    <div class="page-breadcrumb-text">Trang chủ / Lịch chiếu</div>
+                </div>
 
-                    <!-- Date Selection Bar -->
-                    <div class="schedule-date-tabs" id="scheduleDateTabs">
-                        <!-- Populated by JS -->
-                    </div>
+                <div class="section-title-box">
+                    <span class="section-kicker">LỊCH CHIẾU CHI TIẾT</span>
+                    <h1>Lịch chiếu phim hôm nay & sắp tới</h1>
+                    <p>Chọn ngày chiếu để xem các suất chiếu theo từng phòng và vào thẳng sơ đồ chọn ghế.</p>
+                </div>
 
-                    <!-- Schedule List Grouped by Movie -->
-                    <div class="schedule-list" id="scheduleList">
-                        <!-- Loaded dynamically via JS -->
-                    </div>
+                <!-- Date Tabs -->
+                <div class="schedule-date-tabs" id="scheduleDateTabs">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+                <!-- Grouped Schedule List -->
+                <div class="schedule-list" id="scheduleList">
+                    <!-- Populated dynamically by JS -->
                 </div>
             </section>
 
-            <!-- Movie Detail Page -->
+            <!-- ============================================================== -->
+            <!-- 4. MOVIE DETAIL PAGE (GIAO DIỆN CHI TIẾT PHIM GỌN ĐẸP)        -->
+            <!-- ============================================================== -->
             <section id="movieDetailPage" style="display:none;">
-                <div class="detail-box">
-                    <div class="detail-backdrop-glow" id="detailBackdropGlow"></div>
-                    <div class="row g-4 align-items-start">
-                        <div class="col-lg-4 col-md-5">
-                            <div class="detail-poster-wrap">
-                                <img id="moviePoster" class="detail-poster" src="/images/default.jpg" alt="" onerror="this.onerror=null;this.src='/images/default.jpg'">
-                                <div class="detail-poster-badge" id="detailPosterBadge">ĐANG CHIẾU</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-8 col-md-7">
-                            <div class="detail-info-pane">
-                                <h1 class="detail-title" id="movieTitle"></h1>
-                                
-                                <div class="detail-meta-tags">
-                                    <span class="meta-chip meta-genre" id="movieGenre"></span>
-                                    <span class="meta-chip meta-duration">⏱️ <span id="movieDuration"></span> phút</span>
-                                    <span class="meta-chip meta-date">📅 Khởi chiếu: <span id="movieReleaseDate"></span></span>
-                                </div>
-
-                                <div class="detail-meta-crew">
-                                    <div class="crew-item">
-                                        <span class="crew-label">Đạo diễn:</span>
-                                        <span class="crew-name" id="movieDirector"></span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-desc-block">
-                                    <h3>Nội dung phim</h3>
-                                    <p id="movieDescription" class="detail-desc-text"></p>
-                                </div>
-
-                                <div class="detail-showtimes-block">
-                                    <div class="showtimes-heading">
-                                        <h3>Suất chiếu có sẵn</h3>
-                                        <span class="showtimes-sub">Chọn một suất chiếu để tiếp tục chọn ghế</span>
-                                    </div>
-                                    <div id="showtimesContainer" class="detail-showtimes-grid">
-                                        <!-- Loaded dynamically via JS -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                    <button type="button" class="btn-subpage-back ms-2" onclick="showPage('moviesPage')">
+                        🎬 Xem tất cả phim
+                    </button>
+                    <div class="page-breadcrumb-text ms-auto" id="detailBreadcrumb">Trang chủ / Chi tiết phim</div>
                 </div>
-            </section>
 
-            <!-- Booking Page (Seat Selection) -->
-            <section id="bookingPage" style="display:none;">
-                <div class="booking-page-live">
-                    <div class="booking-live-header">
-                        <div class="booking-movie-meta">
-                            <div class="booking-kicker">CHỌN GHẾ TRỰC TUYẾN</div>
-                            <h1 id="bookingMovieTitle" class="booking-title"></h1>
-                            <div class="booking-subtitle" id="bookingSubtitle"></div>
+                <!-- Compact Cinema Movie Detail Card -->
+                <div class="movie-detail-card">
+                    <div class="detail-poster-column">
+                        <div class="detail-poster-wrap">
+                            <img id="moviePoster" class="detail-poster-img" src="/images/default.jpg" alt="" onerror="this.onerror=null;this.src='/images/default.jpg'">
+                            <div class="detail-poster-badge">ĐANG CHIẾU</div>
                         </div>
-                        <div id="liveConnectionBadge" class="live-connection-badge connecting">● Đang kết nối live</div>
                     </div>
-
-                    <form method="post" id="bookingForm">
-                        <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken">
+                    
+                    <div class="detail-info-column">
+                        <h1 class="detail-title" id="movieTitle">Tên bộ phim</h1>
                         
-                        <!-- Ticket Type & Pricing Selector -->
-                        <div class="booking-toolbar-card">
-                            <div class="ticket-type-box">
-                                <label for="ticketType" class="ticket-type-label">Hạng vé áp dụng:</label>
-                                <select name="ticket_type" id="ticketType" class="ticket-type-select">
-                                    <option value="Adult" data-price="100000">Người lớn - 100.000 đ</option>
-                                    <option value="Child" data-price="50000">Trẻ em & Sinh viên - 50.000 đ</option>
-                                </select>
-                            </div>
-                            <div class="room-indicator-box">
-                                <span class="room-pill" id="bookingRoomPill">Phòng chiếu tiêu chuẩn</span>
-                            </div>
+                        <div class="detail-meta-tags">
+                            <span class="meta-chip meta-genre" id="movieGenre">Thể loại</span>
+                            <span class="meta-chip meta-duration">⏱️ <span id="movieDuration">0</span> phút</span>
+                            <span class="meta-chip meta-date">📅 Khởi chiếu: <span id="movieReleaseDate">--/--/----</span></span>
                         </div>
 
-                        <!-- Cinema Room Representation -->
-                        <div class="cinema-room live-cinema-room">
-                            <div class="cinema-screen-wrap">
-                                <div class="cinema-screen">MÀN HÌNH CHIẾU</div>
-                                <div class="screen-light"></div>
+                        <div class="detail-crew-row">
+                            <span class="crew-label">Đạo diễn:</span>
+                            <strong class="crew-value" id="movieDirector">---</strong>
+                        </div>
+
+                        <div class="detail-synopsis-box">
+                            <h3>Nội dung phim</h3>
+                            <p id="movieDescription" class="detail-synopsis-text">Mô tả phim đang được cập nhật...</p>
+                        </div>
+
+                        <div class="detail-showtimes-section">
+                            <div class="showtimes-section-header">
+                                <h3>Suất chiếu có sẵn</h3>
+                                <span class="showtimes-hint">Chọn một suất chiếu bên dưới để bắt đầu đặt ghế</span>
                             </div>
-
-                            <!-- Legend -->
-                            <div class="seat-legend-live">
-                                <div class="legend-item"><span class="legend-seat available"></span> Ghế trống</div>
-                                <div class="legend-item"><span class="legend-seat mine"></span> Bạn đang chọn</div>
-                                <div class="legend-item"><span class="legend-seat holding"></span> Người khác giữ</div>
-                                <div class="legend-item"><span class="legend-seat booked"></span> Đã bán</div>
-                                <div class="legend-item"><span class="legend-seat vip"></span> Ghế VIP</div>
-                            </div>
-
-                            <div id="liveSeatMessage" class="live-seat-message">Vui lòng chọn ghế ưng ý của bạn bên dưới</div>
-
-                            <!-- Cinema Seat Grid -->
-                            <div id="cinemaSeatGrid" class="cinema-seat-grid-live">
-                                <!-- Seats loaded dynamically via JS -->
-                            </div>
-
-                            <!-- Floating Booking Summary Bar -->
-                            <div class="booking-summary-live">
-                                <div class="summary-col">
-                                    <div class="summary-label">Ghế đã chọn</div>
-                                    <div id="selectedSeatNames" class="summary-value highlight-text">Chưa chọn</div>
-                                </div>
-                                <div class="summary-col">
-                                    <div class="summary-label">Số lượng</div>
-                                    <div id="selectedSeatCount" class="summary-value">0 vé</div>
-                                </div>
-                                <div class="summary-col">
-                                    <div class="summary-label">Tổng tiền tạm tính</div>
-                                    <div id="totalPriceDisplay" class="summary-value total-price">0 đ</div>
-                                </div>
-                                <button type="submit" id="bookNowButton" class="btn btn-cinema book-now-button" disabled>
-                                    Xác nhận đặt vé
-                                </button>
+                            <div id="showtimesContainer" class="detail-showtimes-grid">
+                                <!-- Populated dynamically by JS -->
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </section>
 
-            <!-- Login Page -->
+            <!-- ============================================================== -->
+            <!-- 5. BOOKING PAGE (SEAT SELECTION CHUẨN RẠP)                      -->
+            <!-- ============================================================== -->
+            <section id="bookingPage" style="display:none;">
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="goBackFromBooking()">
+                        <span class="back-icon">←</span> Quay lại chi tiết phim
+                    </button>
+                    <button type="button" class="btn-subpage-home ms-2" onclick="showPage('homePage')">
+                        🏠 Về trang chủ
+                    </button>
+                    <div class="page-breadcrumb-text ms-auto">Đặt vé trực tuyến / Chọn ghế</div>
+                </div>
+
+                <div class="booking-container">
+                    <!-- Movie & Showtime Info Header -->
+                    <div class="booking-header-card">
+                        <div class="booking-header-info">
+                            <div class="booking-kicker">ĐẶT VÉ TRỰC TUYẾN</div>
+                            <h1 id="bookingMovieTitle" class="booking-movie-title">Tên phim</h1>
+                            <div id="bookingSubtitle" class="booking-movie-sub">Ngày giờ chiếu</div>
+                        </div>
+                        <div class="booking-header-badges">
+                            <span class="room-badge" id="bookingRoomPill">Phòng 1 - IMAX Laser</span>
+                            <div id="liveConnectionBadge" class="live-connection-badge connected">● Kết nối trực tiếp</div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Selector Toolbar -->
+                    <div class="booking-ticket-toolbar">
+                        <div class="ticket-select-group">
+                            <label for="ticketType" class="ticket-label">Loại vé áp dụng:</label>
+                            <select name="ticket_type" id="ticketType" class="ticket-dropdown">
+                                <option value="Adult" data-price="100000">Người lớn - 100.000 đ</option>
+                                <option value="Child" data-price="50000">Trẻ em & Học sinh - 50.000 đ</option>
+                            </select>
+                        </div>
+                        <div class="ticket-price-hint">
+                            💡 Giá vé cập nhật tự động theo loại vé bạn chọn
+                        </div>
+                    </div>
+
+                    <!-- Cinema Seating Arena -->
+                    <div class="cinema-arena">
+                        <!-- Curved Screen -->
+                        <div class="screen-stage-wrap">
+                            <div class="curved-screen">MÀN HÌNH CHIẾU</div>
+                            <div class="screen-glow"></div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="seat-legend-box">
+                            <div class="legend-item"><span class="legend-box seat-available"></span> Ghế trống</div>
+                            <div class="legend-item"><span class="legend-box seat-mine"></span> Bạn đang chọn</div>
+                            <div class="legend-item"><span class="legend-box seat-holding"></span> Người khác giữ</div>
+                            <div class="legend-item"><span class="legend-box seat-booked"></span> Đã bán</div>
+                            <div class="legend-item"><span class="legend-box seat-vip"></span> Ghế VIP</div>
+                        </div>
+
+                        <!-- Seating Chart -->
+                        <div class="seating-chart-container">
+                            <div id="cinemaSeatGrid" class="cinema-seat-rows-list">
+                                <!-- Populated dynamically by JS with Row A, B, C, D -->
+                            </div>
+                        </div>
+
+                        <!-- Floating Booking Summary Bar -->
+                        <div class="booking-summary-bar">
+                            <div class="summary-field">
+                                <span class="field-label">Ghế đã chọn:</span>
+                                <strong id="selectedSeatNames" class="field-value highlight-seats">Chưa chọn</strong>
+                            </div>
+                            <div class="summary-field">
+                                <span class="field-label">Số lượng vé:</span>
+                                <strong id="selectedSeatCount" class="field-value">0 vé</strong>
+                            </div>
+                            <div class="summary-field">
+                                <span class="field-label">Tổng tiền tạm tính:</span>
+                                <strong id="totalPriceDisplay" class="field-value price-highlight">0 đ</strong>
+                            </div>
+                            <button type="button" id="bookNowButton" class="btn btn-cinema btn-book-action" disabled onclick="executeBooking()">
+                                Xác nhận đặt vé
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- 6. MY TICKETS PAGE (VÉ CỦA TÔI)                                -->
+            <!-- ============================================================== -->
+            <section id="ticketsPage" style="display:none;">
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                    <button type="button" class="btn-subpage-back ms-2" onclick="showPage('moviesPage')">
+                        + Đặt thêm vé khác
+                    </button>
+                    <div class="page-breadcrumb-text ms-auto">Trang chủ / Vé của tôi</div>
+                </div>
+
+                <div class="section-title-box">
+                    <span class="section-kicker">VÉ CỦA BẠN</span>
+                    <h1>Danh sách vé xem phim đã đặt</h1>
+                    <p>Xem thông tin chi tiết, mã vé điện tử và quản lý các vé bạn đã đặt thành công.</p>
+                </div>
+
+                <div class="ticket-grid" id="ticketsGrid">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- 7. STANDALONE LOGIN & REGISTER PAGES (FALLBACK)               -->
+            <!-- ============================================================== -->
             <section id="loginPage" style="display:none;">
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                </div>
                 <div class="form-box glass-panel">
                     <div class="auth-header">
                         <div class="auth-icon">🔐</div>
                         <h2>Đăng nhập CineBook</h2>
                         <p class="auth-subtitle">Đăng nhập để đặt vé và lưu giữ chỗ của bạn</p>
                     </div>
-
                     <div id="loginError" class="alert alert-danger" style="display:none;"></div>
-                    
                     <form id="loginForm">
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập</label>
-                            <input class="form-control" type="text" name="username" id="loginUsername" placeholder="Nhập username (ví dụ: admin)" required autocomplete="username">
+                            <input class="form-control" type="text" id="loginUsername" placeholder="Nhập username (ví dụ: admin)" required autocomplete="username">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mật khẩu</label>
-                            <input class="form-control" type="password" name="password" id="loginPassword" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                            <input class="form-control" type="password" id="loginPassword" placeholder="Nhập mật khẩu" required autocomplete="current-password">
                         </div>
-                        <button class="btn btn-cinema w-100 py-2 fw-semibold" type="submit">Đăng nhập ngay</button>
+                        <button class="btn btn-cinema w-100 py-2 fw-semibold" type="submit">Đăng nhập</button>
                     </form>
-
-                    <div class="admin-hint-card">
-                        <span class="hint-badge">Mẹo kiểm thử:</span>
-                        Tài khoản Admin: <code>admin</code> / Mật khẩu: <code>123</code>
+                    <div class="admin-quick-fill-btn" onclick="quickFillAdmin()">
+                        ⚡ Điền nhanh tài khoản Admin mẫu: <code>admin / 123</code>
                     </div>
-
                     <p class="mt-3 text-center auth-switch">
-                        Chưa có tài khoản? <a href="#register" class="accent-link">Đăng ký tài khoản mới</a>
+                        Chưa có tài khoản? <a href="#register" class="accent-link" onclick="openAuthModal('register')">Đăng ký tài khoản mới</a>
                     </p>
                 </div>
             </section>
 
-            <!-- Register Page -->
             <section id="registerPage" style="display:none;">
+                <div class="page-top-action-bar">
+                    <button type="button" class="btn-subpage-back" onclick="showPage('homePage')">
+                        <span class="back-icon">←</span> Quay lại trang chủ
+                    </button>
+                </div>
                 <div class="form-box glass-panel">
                     <div class="auth-header">
                         <div class="auth-icon">✨</div>
                         <h2>Đăng ký thành viên</h2>
                         <p class="auth-subtitle">Tạo tài khoản nhanh để trải nghiệm đặt vé tiện lợi</p>
                     </div>
-
                     <div id="registerError" class="alert alert-danger" style="display:none;"></div>
-
                     <form id="registerForm">
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập *</label>
-                            <input class="form-control" type="text" name="username" id="regUsername" placeholder="Ít nhất 3 ký tự" required autocomplete="username">
+                            <input class="form-control" type="text" id="regUsername" placeholder="Tối thiểu 3 ký tự" required autocomplete="username">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email *</label>
-                            <input class="form-control" type="email" name="email" id="regEmail" placeholder="name@example.com" required autocomplete="email">
+                            <input class="form-control" type="email" id="regEmail" placeholder="name@example.com" required autocomplete="email">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Họ và tên</label>
-                            <input class="form-control" type="text" name="name" id="regName" placeholder="Nguyễn Văn A" autocomplete="name">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tuổi</label>
-                            <input class="form-control" type="number" name="age" id="regAge" min="1" max="120" placeholder="18">
+                            <input class="form-control" type="text" id="regName" placeholder="Nguyễn Văn A" autocomplete="name">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mật khẩu *</label>
-                            <input class="form-control" type="password" name="password" id="regPassword" placeholder="Tối thiểu 6 ký tự" required autocomplete="new-password" minlength="6">
+                            <input class="form-control" type="password" id="regPassword" placeholder="Tối thiểu 6 ký tự" required autocomplete="new-password" minlength="6">
                         </div>
                         <button class="btn btn-success w-100 py-2 fw-semibold" type="submit">Tạo tài khoản</button>
                     </form>
-
                     <p class="mt-3 text-center auth-switch">
-                        Đã có tài khoản? <a href="#login" class="accent-link">Đăng nhập</a>
+                        Đã có tài khoản? <a href="#login" class="accent-link" onclick="openAuthModal('login')">Đăng nhập</a>
                     </p>
-                </div>
-            </section>
-
-            <!-- My Tickets Page -->
-            <section id="ticketsPage" style="display:none;">
-                <div class="my-tickets-page">
-                    <div class="section-title-box">
-                        <span class="section-kicker">VÉ CỦA BẠN</span>
-                        <h1>Danh sách vé đã đặt</h1>
-                        <p>Xem thông tin chi tiết vé xem phim, phòng chiếu và mã vé điện tử của bạn.</p>
-                    </div>
-                    <div class="ticket-grid" id="ticketsGrid">
-                        <!-- Loaded dynamically via JS -->
-                    </div>
-                </div>
-
-                <!-- Cancel Confirm Modal -->
-                <div id="cancelConfirmOverlay" class="cancel-confirm-overlay">
-                    <div class="cancel-confirm-box">
-                        <div class="cancel-confirm-icon">⚠️</div>
-                        <h3>Xác nhận hủy vé</h3>
-                        <p id="cancelConfirmText">Bạn có chắc chắn muốn hủy vé xem phim này không? Hành động này sẽ trả lại ghế trống cho phòng chiếu.</p>
-                        <div class="cancel-confirm-actions">
-                            <button type="button" id="cancelNoButton" class="cancel-no">Giữ lại vé</button>
-                            <button type="button" id="cancelYesButton" class="cancel-yes">Xác nhận hủy</button>
-                        </div>
-                    </div>
                 </div>
             </section>
         </main>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- 8. UNIVERSAL AUTH MODAL (POPUP ĐĂNG NHẬP / ĐĂNG KÝ TIỆN LỢI)   -->
+    <!-- ============================================================== -->
+    <div id="authModalOverlay" class="auth-modal-overlay" style="display:none;">
+        <div class="auth-modal-card">
+            <button type="button" class="auth-modal-close" onclick="closeAuthModal()" aria-label="Đóng">✕</button>
+            
+            <div class="auth-modal-tabs">
+                <button type="button" id="tabLoginBtn" class="auth-tab active" onclick="switchAuthTab('login')">Đăng nhập</button>
+                <button type="button" id="tabRegisterBtn" class="auth-tab" onclick="switchAuthTab('register')">Đăng ký</button>
+            </div>
+
+            <div id="modalAuthAlert" class="alert alert-danger" style="display:none;"></div>
+
+            <!-- Modal Login Form -->
+            <div id="modalLoginForm">
+                <form onsubmit="handleModalLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" id="modalLoginUser" class="form-control" placeholder="admin" required autocomplete="username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <input type="password" id="modalLoginPass" class="form-control" placeholder="123" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-cinema w-100 py-2 fw-semibold">Đăng nhập ngay</button>
+                </form>
+
+                <div class="admin-quick-fill-btn" onclick="quickFillModalAdmin()">
+                    ⚡ Dùng ngay tài khoản Admin mẫu: <code>admin / 123</code>
+                </div>
+            </div>
+
+            <!-- Modal Register Form -->
+            <div id="modalRegisterForm" style="display:none;">
+                <form onsubmit="handleModalRegister(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập *</label>
+                        <input type="text" id="modalRegUser" class="form-control" placeholder="Nhập username" required autocomplete="username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" id="modalRegEmail" class="form-control" placeholder="email@example.com" required autocomplete="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Họ tên</label>
+                        <input type="text" id="modalRegName" class="form-control" placeholder="Họ và tên của bạn" autocomplete="name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu *</label>
+                        <input type="password" id="modalRegPass" class="form-control" placeholder="Tối thiểu 6 ký tự" required autocomplete="new-password" minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">Tạo tài khoản</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 9. CANCEL TICKET CONFIRM MODAL                                 -->
+    <!-- ============================================================== -->
+    <div id="cancelConfirmOverlay" class="cancel-confirm-overlay" style="display:none;">
+        <div class="cancel-confirm-box">
+            <div class="cancel-confirm-icon">⚠️</div>
+            <h3>Xác nhận hủy vé</h3>
+            <p id="cancelConfirmText">Bạn có chắc chắn muốn hủy vé xem phim này không? Ghế sẽ được hoàn lại cho phòng chiếu.</p>
+            <div class="cancel-confirm-actions">
+                <button type="button" id="cancelNoButton" class="cancel-no" onclick="closeCancelModal()">Giữ lại vé</button>
+                <button type="button" id="cancelYesButton" class="cancel-yes" onclick="executeCancelTicket()">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Background Playlist Data -->
     <script id="background-playlist-data" type="application/json">[]</script>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- App JS -->
     <script src="/js/app.js"></script>
 </body>
