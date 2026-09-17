@@ -8,8 +8,9 @@
     <title>CineBook - Đặt vé xem phim online</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mobile_nav_fix.css">
 </head>
 <body>
     <!-- Navbar -->
@@ -18,7 +19,7 @@
             <a class="navbar-brand fw-bold cinema-brand" href="/" aria-label="CineBook Home" onclick="event.preventDefault(); showPage('homePage');">
                 <span class="brand-icon">🎬</span> CineBook
             </a>
-            <button class="navbar-toggler cinema-mobile-toggler" type="button" onclick="toggleMobileNav()" aria-label="Mở menu">
+            <button class="navbar-toggler cinema-mobile-toggler" type="button" id="mobileNavToggler" onclick="toggleMobileNav()" aria-label="Mở menu" aria-expanded="false" aria-controls="mainNavbar">
                 <span></span><span></span><span></span>
             </button>
             <div class="collapse navbar-collapse cinema-navbar-collapse" id="mainNavbar">
@@ -83,21 +84,21 @@
                 <div class="cinema-perks-row">
                     <div class="perk-card">
                         <div class="perk-icon">⚡</div>
-                        <div>
+                        <div class="perk-text">
                             <div class="perk-title">Đặt vé tức thì</div>
                             <div class="perk-sub">Giữ chỗ thời gian thực trong 5 phút</div>
                         </div>
                     </div>
                     <div class="perk-card">
                         <div class="perk-icon">💎</div>
-                        <div>
+                        <div class="perk-text">
                             <div class="perk-title">Phòng chiếu đỉnh cao</div>
-                            <div class="perk-sub">IMAX Laser, Dolby Atmos & VIP Gold Class</div>
+                            <div class="perk-sub">IMAX Laser, Dolby Atmos &amp; VIP Gold Class</div>
                         </div>
                     </div>
                     <div class="perk-card">
                         <div class="perk-icon">🎟️</div>
-                        <div>
+                        <div class="perk-text">
                             <div class="perk-title">Vé điện tử thông minh</div>
                             <div class="perk-sub">Quản lý và hủy vé linh hoạt trên web</div>
                         </div>
@@ -296,7 +297,8 @@
                     <div class="cinema-arena">
                         <!-- Curved Screen -->
                         <div class="screen-stage-wrap">
-                            <div class="curved-screen">MÀN HÌNH CHIẾU</div>
+                            <div class="curved-screen"></div>
+                            <div class="screen-label">MÀN HÌNH CHIẾU</div>
                             <div class="screen-glow"></div>
                         </div>
 
@@ -437,6 +439,24 @@
                 </div>
             </section>
         </main>
+
+        <!-- Site Footer -->
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand-block">
+                    <div class="footer-brand">
+                        <span>🎬</span> CineBook
+                    </div>
+                    <div class="footer-tagline">Trải nghiệm rạp chiếu phim ngay trên web — đặt vé nhanh, chọn ghế thông minh.</div>
+                </div>
+                <nav class="footer-links" aria-label="Footer navigation">
+                    <a href="#" onclick="event.preventDefault(); showPage('homePage');">Trang chủ</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('moviesPage');">Phim đang chiếu</a>
+                    <a href="#" onclick="event.preventDefault(); loadSchedule();">Lịch chiếu</a>
+                </nav>
+                <div class="footer-copy">© 2026 CineBook</div>
+            </div>
+        </footer>
     </div>
 
     <!-- ============================================================== -->

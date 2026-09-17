@@ -67,15 +67,26 @@ function showPage(pageId) {
 
     // Close mobile nav if open
     const navCollapse = document.getElementById('mainNavbar');
+    const toggler = document.getElementById('mobileNavToggler');
     if (navCollapse) navCollapse.classList.remove('show');
+    if (toggler) {
+        toggler.classList.remove('is-open');
+        toggler.setAttribute('aria-expanded', 'false');
+    }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleMobileNav() {
     const navCollapse = document.getElementById('mainNavbar');
+    const toggler = document.getElementById('mobileNavToggler');
     if (navCollapse) {
         navCollapse.classList.toggle('show');
+        const isOpen = navCollapse.classList.contains('show');
+        if (toggler) {
+            toggler.classList.toggle('is-open', isOpen);
+            toggler.setAttribute('aria-expanded', String(isOpen));
+        }
     }
 }
 
@@ -658,15 +669,16 @@ function renderSeats(snapshot) {
                     }
 
                     return `
-                        <button type="button" 
-                                class="live-seat ${statusClass}" 
+                        <button type="button"
+                                class="live-seat ${statusClass}"
                                 id="seat-btn-${seat.id}"
-                                data-seat-id="${seat.id}" 
+                                data-seat-id="${seat.id}"
                                 data-seat-code="${seat.seatCode}"
                                 ${isDisabled ? 'disabled' : ''}
                                 onclick="toggleSeat(${seat.id}, '${seat.seatCode}')"
                                 title="Ghế ${seat.seatCode} ${seat.isVip ? '(VIP)' : ''}">
-                            ${seat.seatCode}
+                            <span class="seat-back">${seat.seatCode}</span>
+                            <span class="seat-base"></span>
                         </button>
                     `;
                 }).join('')}
