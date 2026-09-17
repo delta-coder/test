@@ -84,12 +84,12 @@ async def startup_event():
                 "poster_url": "/images/movies/inception.jpg"
             },
             {
-                "title": "Spider-Man: No Way Home",
+                "title": "Spider-Man: Brand New Day",
                 "genre": "Hành động, Phiêu lưu, Viễn tưởng",
                 "duration": 148,
                 "director": "Jon Watts",
-                "release_date": datetime(2021, 12, 17).date(),
-                "description": "Khi danh tính Người Nhện bị phơi bày, Peter Parker nhờ Doctor Strange giúp đỡ, vô tình mở ra đa vũ trụ với hàng loạt kẻ phản diện nguy hiểm.",
+                "release_date": datetime(2026, 7, 27).date(),
+                "description": "Peter Parker cô độc chật vật bảo vệ New York trước kẻ thù tâm linh bí ẩn, trong khi siêu năng lực bị biến đổi nguy hiểm do áp lực từ việc cả thế giới quên mất danh tính của cậu.",
                 "poster_url": "/images/movies/spider-man.jpg"
             },
             {
