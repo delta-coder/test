@@ -461,11 +461,13 @@
 
 
     /* -------------------------------------------------------
-       FOOTER - text color fixes for mobile
+       FOOTER - fix z-index + text color for mobile
     -------------------------------------------------------- */
 
     .site-footer {
-        background: rgba(5, 8, 18, 0.98) !important;
+        position: relative !important;
+        z-index: 10 !important;                   /* above stage-overlay */
+        background: rgba(5, 8, 18, 1) !important; /* fully opaque */
     }
 
     .footer-brand {
@@ -474,13 +476,13 @@
     }
 
     .footer-tagline {
-        color: #c8d3e3 !important;
+        color: #ffffff !important;
         font-size: 0.83rem !important;
         margin-top: 5px !important;
     }
 
     .footer-links a {
-        color: #c8d3e3 !important;
+        color: #ffffff !important;
         font-size: 0.88rem !important;
         min-height: 36px !important;
         display: inline-flex !important;
@@ -488,7 +490,7 @@
     }
 
     .footer-links a:hover {
-        color: #ffffff !important;
+        color: #ff6b35 !important;
     }
 
     .footer-copy {

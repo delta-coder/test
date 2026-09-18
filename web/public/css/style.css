@@ -327,7 +327,9 @@ button { font-family: inherit; }
    SITE FOOTER
    ========================================================================== */
 .site-footer {
-    background: rgba(5, 8, 18, 0.95);
+    position: relative;
+    z-index: 10;                          /* above stage-overlay */
+    background: rgba(5, 8, 18, 1);        /* fully opaque — blocks overlay below */
     border-top: 1px solid var(--border);
     padding: 36px 34px 28px;
     margin-top: 0;
@@ -353,7 +355,7 @@ button { font-family: inherit; }
 
 .footer-tagline {
     font-size: 0.82rem;
-    color: #c8d3e3;
+    color: #ffffff;
     margin-top: 4px;
 }
 
@@ -365,11 +367,11 @@ button { font-family: inherit; }
 
 .footer-links a {
     font-size: 0.86rem;
-    color: #c8d3e3;
+    color: #ffffff;
     transition: color 0.18s ease;
 }
 
-.footer-links a:hover { color: #ffffff; }
+.footer-links a:hover { color: #ff6b35; }
 
 .footer-copy {
     font-size: 0.8rem;
