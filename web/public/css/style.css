@@ -353,7 +353,7 @@ button { font-family: inherit; }
 
 .footer-tagline {
     font-size: 0.82rem;
-    color: #a8b4c8;
+    color: #c8d3e3;
     margin-top: 4px;
 }
 
@@ -365,15 +365,15 @@ button { font-family: inherit; }
 
 .footer-links a {
     font-size: 0.86rem;
-    color: #a8b4c8;
+    color: #c8d3e3;
     transition: color 0.18s ease;
 }
 
-.footer-links a:hover { color: #e2e8f0; }
+.footer-links a:hover { color: #ffffff; }
 
 .footer-copy {
     font-size: 0.8rem;
-    color: #8795ad;
+    color: #ffffff;
     font-family: var(--font-mono);
 }
 
