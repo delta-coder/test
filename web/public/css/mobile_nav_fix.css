@@ -19,6 +19,9 @@
         left: 10px !important;
         right: 10px !important;
 
+        /* Reset desktop translateX(-50%) — must be none on mobile */
+        transform: none !important;
+
         width: auto !important;
         max-width: none !important;
 
@@ -454,6 +457,43 @@
 
     .cancel-confirm-overlay {
         z-index: 10000 !important;
+    }
+
+
+    /* -------------------------------------------------------
+       FOOTER - text color fixes for mobile
+    -------------------------------------------------------- */
+
+    .site-footer {
+        background: rgba(5, 8, 18, 0.98) !important;
+    }
+
+    .footer-brand {
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+    }
+
+    .footer-tagline {
+        color: #a8b4c8 !important;
+        font-size: 0.83rem !important;
+        margin-top: 5px !important;
+    }
+
+    .footer-links a {
+        color: #a8b4c8 !important;
+        font-size: 0.88rem !important;
+        min-height: 36px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .footer-links a:hover {
+        color: #ffffff !important;
+    }
+
+    .footer-copy {
+        color: #8795ad !important;
+        font-size: 0.82rem !important;
     }
 
 }
