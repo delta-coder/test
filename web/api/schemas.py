@@ -115,6 +115,7 @@ class TicketOut(BaseModel):
     price: int
     created_at: datetime
     seat_number: int
+    seat_code: str = ""  # Mã ghế dạng "A1", "B3" (được tính từ backend)
     movie_title: str
     room_name: str
     start_time: datetime

@@ -785,11 +785,14 @@ function setupLiveSeatSync(showtimeId) {
         }
 
         try {
-            // Heartbeat for our held seats
+            // BUG-5 FIX: Heartbeat với seat_ids để server biết ghế nào cần gia hạn
             if (seatData.mine.size > 0) {
                 await fetchAPI(`/showtimes/${showtimeId}/seat-action`, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'heartbeat' })
+                    body: JSON.stringify({ 
+                        action: 'heartbeat',
+                        seat_ids: Array.from(seatData.mine)
+                    })
                 });
             }
 
@@ -826,17 +829,22 @@ async function executeBooking() {
     }
 
     try {
+        // BUG-1 FIX: Thêm seat_ids vào request body (backend yêu cầu cả seat_ids lẫn ticket_type)
+        // BUG-6 FIX: API trả về list[TicketOut] trực tiếp (không wrap trong { tickets: [...] })
         const result = await fetchAPI(`/showtimes/${currentShowtimeId}/book`, {
             method: 'POST',
-            body: JSON.stringify({ ticket_type: ticketType })
+            body: JSON.stringify({ 
+                ticket_type: ticketType,
+                seat_ids: Array.from(seatData.mine)
+            })
         });
 
-        if (result && result.tickets) {
-            showAlert(`Đặt vé thành công! Bạn đã đặt ${result.tickets.length} vé.`, 'success');
+        if (Array.isArray(result) && result.length > 0) {
+            showAlert(`Đặt vé thành công! Bạn đã đặt ${result.length} vé. Chuyển đến trang vé của bạn...`, 'success');
             seatData.mine.clear();
             if (seatPollingInterval) clearInterval(seatPollingInterval);
             loadMyTickets();
-        } else {
+        } else if (result !== null) {
             showAlert('Đặt vé không thành công, vui lòng thử lại.', 'danger');
         }
     } catch (e) {
@@ -892,11 +900,17 @@ function renderMyTickets(tickets) {
         const dateStr = new Date(t.start_time).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
         const timeStr = new Date(t.start_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
         
-        // Calculate seat code
-        const seatNum = t.seat_number || 1;
-        const rowLetter = String.fromCharCode(65 + Math.floor((seatNum - 1) / 6));
-        const colNum = ((seatNum - 1) % 6) + 1;
-        const seatCode = `${rowLetter}${colNum}`;
+        // BUG-8 FIX: Dùng seat_code từ backend (đã được tính đúng theo room capacity)
+        // Fallback: tính nếu backend chưa trả về
+        const seatCode = t.seat_code || (() => {
+            const seatNum = t.seat_number || 1;
+            const rowLetter = String.fromCharCode(65 + Math.floor((seatNum - 1) / 6));
+            const colNum = ((seatNum - 1) % 6) + 1;
+            return `${rowLetter}${colNum}`;
+        })();
+
+        // Escape title để an toàn trong onclick attribute
+        const safeTitleAttr = t.movie_title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         return `
             <div class="ticket-stub-card" id="ticket-card-${t.id}">
@@ -916,7 +930,7 @@ function renderMyTickets(tickets) {
                 <div class="ticket-stub-perforation"></div>
                 <div class="ticket-stub-footer">
                     <div class="ticket-price-box">${formatVND(t.price)}</div>
-                    <button type="button" class="ticket-cancel-btn" onclick="openCancelModal(${t.id}, '${t.movie_title}', '${seatCode}')">
+                    <button type="button" class="ticket-cancel-btn" onclick="openCancelModal(${t.id}, '${safeTitleAttr}', '${seatCode}')">
                         Hủy vé
                     </button>
                 </div>

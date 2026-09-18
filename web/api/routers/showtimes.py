@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from ..db import get_db
 from ..deps import get_current_user, get_current_user_optional
-from ..models import Showtime, Ticket, User
+from ..models import Showtime, Ticket, User, Seat
 from ..schemas import BookIn, MessageOut, SeatActionIn, SeatSnapshot, ShowtimeOut, TicketOut
 from ..seat_service import get_seat_snapshot, purge_expired_holds, release_all, hold_seat, release_seat, heartbeat
 from ..auth import decode_access_token
@@ -25,12 +25,16 @@ def _optional_user(db: Session, token: str | None) -> User | None:
     return db.get(User, int(payload["sub"]))
 
 
-from datetime import datetime, timedelta, timezone
+def _utcnow() -> datetime:
+    """Trả về thời gian hiện tại UTC (naive) để so sánh với DB."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
 
 @router.get("/showtimes", response_model=list[ShowtimeOut])
 def list_showtimes(db: Session = Depends(get_db)):
-    # Include showtimes starting from earlier today
-    now = datetime.now(timezone.utc) - timedelta(hours=4)
+    # Lọc các suất chiếu từ 4 giờ trước đến tương lai (cho phép xem suất chiếu đang diễn ra)
+    # Dùng naive datetime để so sánh với SQLite (không lưu timezone)
+    now = _utcnow() - timedelta(hours=4)
     rows = (
         db.execute(
             select(Showtime)
@@ -167,11 +171,23 @@ def book_tickets(
     if not st:
         raise HTTPException(status_code=404, detail="Không tìm thấy suất chiếu.")
 
+    # Kiểm tra suất chiếu chưa kết thúc
+    now_naive = _utcnow()
+    st_time = st.start_time
+    if hasattr(st_time, 'tzinfo') and st_time.tzinfo is not None:
+        st_time = st_time.replace(tzinfo=None)
+    if st_time <= now_naive:
+        raise HTTPException(
+            status_code=400,
+            detail="Không thể đặt vé cho suất chiếu đã kết thúc."
+        )
+
     purge_expired_holds(db, showtime_id)
     price = PRICES[payload.ticket_type]
     created: list[Ticket] = []
 
     for seat_id in payload.seat_ids:
+        # Kiểm tra ghế đã có vé chưa
         existing = db.scalar(
             select(Ticket.id).where(
                 Ticket.showtime_id == showtime_id, Ticket.seat_id == seat_id
@@ -182,11 +198,18 @@ def book_tickets(
                 status_code=409, detail=f"Ghế {seat_id} đã được đặt."
             )
 
+        # BUG-2 FIX: Chỉ kiểm tra ghế bị người KHÁC hold (không phải của user hiện tại)
         snap = get_seat_snapshot(db, showtime_id, user.id)
+        # snap["held"] = ghế người khác đang giữ, snap["mine"] = ghế user đang giữ
         if seat_id in snap["held"]:
             raise HTTPException(
                 status_code=409, detail=f"Ghế {seat_id} đang được người khác chọn."
             )
+        # Ghế phải thuộc về user (đang hold) hoặc là ghế trống
+        # Nếu ghế không phải của user và không trong held → ghế trống → cho phép
+        if seat_id not in snap["mine"] and seat_id not in snap["booked"]:
+            # Ghế trống, có thể book trực tiếp (không cần hold trước)
+            pass
 
         ticket = Ticket(
             user_id=user.id,
@@ -199,23 +222,40 @@ def book_tickets(
         created.append(ticket)
 
     db.flush()
+    # Giải phóng tất cả holds của user cho showtime này sau khi đặt vé
     release_all(db, showtime_id, user.id)
     db.commit()
 
     for t in created:
         db.refresh(t)
+        # Load quan hệ seat để lấy seat number
+        if not t.seat:
+            t.seat = db.get(Seat, t.seat_id)
 
     result = []
     for t in created:
+        seat_num = t.seat.number if t.seat else 0
+        # Tính seat_code: phòng chiếu thường có 5-6 cột
+        room_capacity = st.room.capacity if st.room else 24
+        cols = 6
+        if room_capacity <= 16:
+            cols = 4
+        elif room_capacity <= 20:
+            cols = 5
+        row_letter = chr(65 + (seat_num - 1) // cols)
+        col_num = ((seat_num - 1) % cols) + 1
+        seat_code = f"{row_letter}{col_num}"
+
         result.append(
             TicketOut(
                 id=t.id,
                 ticket_type=t.ticket_type,
                 price=t.price,
                 created_at=t.created_at,
-                seat_number=t.seat.number,
-                movie_title=st.movie.title,
-                room_name=st.room.name,
+                seat_number=seat_num,
+                seat_code=seat_code,
+                movie_title=st.movie.title if st.movie else "N/A",
+                room_name=st.room.name if st.room else "N/A",
                 start_time=st.start_time,
                 showtime_id=st.id,
             )

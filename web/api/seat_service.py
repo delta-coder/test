@@ -11,7 +11,8 @@ settings = get_settings()
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    """Trả về naive UTC datetime để tương thích với SQLite (không lưu timezone)."""
+    return datetime.utcnow()
 
 
 def purge_expired_holds(db: Session, showtime_id: int | None = None) -> None:

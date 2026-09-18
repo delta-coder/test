@@ -2,9 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import auth, movies, showtimes, tickets
 from .config import get_settings
-from .db import init_db, engine
+from .db import init_db, engine, SessionLocal
 from . import models  # noqa: F401
-from sqlalchemy.orm import Session
 import os
 
 settings = get_settings()
@@ -23,11 +22,13 @@ async def startup_event():
     # Create demo data if tables are empty
     from .auth import get_password_hash
     from .models import User, Movie, Room, Seat, Showtime
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
 
-    db = Session(engine)
+    # BUG-10 FIX: Dùng SessionLocal() chuẩn thay vì Session(engine)
+    db = SessionLocal()
     try:
         # Create or update admin user
+        from sqlalchemy.orm import Session as OrmSession
         admin_user = db.query(User).filter(User.username == settings.admin_username).first()
         if not admin_user:
             admin_user = User(
@@ -227,7 +228,8 @@ async def startup_event():
 
             # Seed rich showtimes across today and next 4 days
             movies = db.query(Movie).all()
-            now_dt = datetime.now()
+            # BUG-3 FIX: Seed naive datetime (không timezone) để tương thích SQLite
+            now_dt = datetime.utcnow()
             # Slot schedule: times of day
             daily_slots = [
                 (9, 30),
@@ -245,6 +247,7 @@ async def startup_event():
                     # Rotate movies and rooms for variety
                     movie = movies[(day_offset * 3 + slot_idx) % len(movies)]
                     room = rooms[slot_idx % len(rooms)]
+                    # BUG-3 FIX: Dùng naive datetime, không dùng timezone-aware
                     st_time = datetime(slot_date.year, slot_date.month, slot_date.day, hour, minute)
                     
                     db.add(Showtime(
@@ -263,30 +266,38 @@ async def startup_event():
         db.close()
 
 # CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# BUG-9 FIX: Khi allow_credentials=True, không thể dùng wildcard "*" cho origins
+# Phải chỉ định origins cụ thể. Nếu origins_list là ["*"], chuyển sang không dùng credentials mode.
+origins = settings.origins_list
+if "*" in origins:
+    # Cho phép tất cả origins nhưng không dùng credentials — hoạt động với cookie samesite lax
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 from fastapi import APIRouter
 from fastapi.staticfiles import StaticFiles
 
-# Create api_router with prefix /api (matches app.js API_BASE='/api')
+# BUG-11 FIX: Chỉ đăng ký router một lần qua api_router với prefix /api
+# Không đăng ký lại ở root để tránh duplicate routes
 api_router = APIRouter(prefix="/api")
 api_router.include_router(auth.router)
 api_router.include_router(movies.router)
 api_router.include_router(showtimes.router)
 api_router.include_router(tickets.router)
 app.include_router(api_router)
-
-# Also include at root for direct calls or Vercel route rewrites
-app.include_router(auth.router)
-app.include_router(movies.router)
-app.include_router(showtimes.router)
-app.include_router(tickets.router)
 
 
 @app.get("/health")

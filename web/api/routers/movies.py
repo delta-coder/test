@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
@@ -27,11 +29,20 @@ def movie_showtimes(movie_id: int, db: Session = Depends(get_db)):
     movie = db.get(Movie, movie_id)
     if not movie:
         raise HTTPException(status_code=404, detail="Không tìm thấy phim.")
+
+    # BUG-7 FIX: Chỉ trả về suất chiếu chưa bắt đầu (hoặc bắt đầu trong vòng 4 giờ trước)
+    # Dùng naive datetime để tương thích với SQLite
+    now = datetime.utcnow()
+    cutoff = now - timedelta(hours=4)
+
     rows = (
         db.execute(
             select(Showtime)
             .options(joinedload(Showtime.movie), joinedload(Showtime.room))
-            .where(Showtime.movie_id == movie_id)
+            .where(
+                Showtime.movie_id == movie_id,
+                Showtime.start_time >= cutoff,  # Bỏ các suất chiếu đã qua quá 4 giờ
+            )
             .order_by(Showtime.start_time)
         )
         .scalars()
